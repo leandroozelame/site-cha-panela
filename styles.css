@@ -8,11 +8,48 @@ body {
   letter-spacing: 0.2px;
 }
 
+.welcome-wrap {
+  margin-bottom: 1.5rem;
+}
+
 .hero-card {
   background: linear-gradient(135deg, #ffffff 0%, #f5ebe5 100%);
   border-radius: 28px;
-  padding: 32px;
+  padding: 28px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.hero-text-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-image-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invite-frame {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+}
+
+.invite-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+}
+
+.intro-form-card {
+  margin-top: auto;
 }
 
 .section-card {
@@ -41,8 +78,12 @@ body {
   background: #ececec;
 }
 
-.product-link {
-  text-decoration: none;
+.product-meta {
+  font-size: 0.92rem;
+}
+
+.touch-btn {
+  min-height: 46px;
 }
 
 .qty-pill {
@@ -56,11 +97,12 @@ body {
 
 .qty-pill button {
   border: 0;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-weight: 700;
 }
 
 .sticky-summary {
@@ -78,18 +120,39 @@ body {
   object-fit: cover;
   border-radius: 14px;
   background: #ededed;
+  flex-shrink: 0;
 }
 
-.badge-stock {
-  font-size: 0.76rem;
+.id-badge {
+  font-size: 0.78rem;
 }
 
-.mode-pill {
-  border-radius: 999px;
+@media (max-width: 1199px) {
+  .invite-frame {
+    max-width: 560px;
+  }
 }
 
 @media (max-width: 991px) {
   .sticky-summary {
     position: static;
+  }
+
+  .hero-card {
+    padding: 22px;
+  }
+
+  .product-image {
+    height: 200px;
+  }
+
+  .qty-pill button,
+  .btn,
+  button {
+    touch-action: manipulation;
+  }
+
+  .invite-frame {
+    max-width: 100%;
   }
 }

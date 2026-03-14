@@ -1,90 +1,92 @@
-const CONFIG = window.APP_CONFIG || {};
-const USE_MOCK = !!CONFIG.USE_MOCK;
-const API_BASE_URL = (CONFIG.API_BASE_URL || "").replace(/\/$/, "");
-const GOOGLE_CLIENT_ID = CONFIG.GOOGLE_CLIENT_ID || "";
-
 const DEFAULT_PRODUCTS = [
   {
     id: 1,
     name: "Jogo de Taças",
+    category: "Cozinha",
     description: "Conjunto com 6 taças de vidro.",
     image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 89.90,
-    total_quantity: 1
+    available_quantity: 1,
+    created_at: "10/03/2026 09:00:00"
   },
   {
     id: 2,
     name: "Conjunto de Panelas",
+    category: "Cozinha",
     description: "Kit antiaderente para o dia a dia.",
     image_url: "https://images.unsplash.com/photo-1584990347449-a4d05d7f182d?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 349.90,
-    total_quantity: 1
+    available_quantity: 1,
+    created_at: "10/03/2026 09:15:00"
   },
   {
     id: 3,
     name: "Faqueiro",
+    category: "Cozinha",
     description: "Conjunto de talheres com 24 peças.",
     image_url: "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 159.00,
-    total_quantity: 1
+    available_quantity: 1,
+    created_at: "10/03/2026 09:30:00"
   },
   {
     id: 4,
     name: "Aparelho de Jantar",
+    category: "Mesa Posta",
     description: "Jogo com pratos e bowls para 4 pessoas.",
     image_url: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 229.90,
-    total_quantity: 2
+    available_quantity: 2,
+    created_at: "10/03/2026 09:45:00"
   },
   {
     id: 5,
     name: "Jogo de Cama",
+    category: "Quarto",
     description: "Jogo queen com 4 peças.",
     image_url: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 199.90,
-    total_quantity: 1
+    available_quantity: 1,
+    created_at: "10/03/2026 10:00:00"
   },
   {
     id: 6,
     name: "Liquidificador",
+    category: "Eletroportáteis",
     description: "Modelo doméstico de alta potência.",
     image_url: "https://images.unsplash.com/photo-1570222094114-d054a817e56b?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 179.90,
-    total_quantity: 1
+    available_quantity: 1,
+    created_at: "10/03/2026 10:15:00"
   },
   {
     id: 7,
     name: "Sanduicheira",
+    category: "Eletroportáteis",
     description: "Compacta e prática para o café da manhã.",
     image_url: "https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 149.90,
-    total_quantity: 1
+    available_quantity: 1,
+    created_at: "10/03/2026 10:30:00"
   },
   {
     id: 8,
     name: "Jogo de Toalhas",
+    category: "Banheiro",
     description: "Kit com toalhas macias para banheiro.",
     image_url: "https://images.unsplash.com/photo-1631049035182-249067d7618e?q=80&w=1200&auto=format&fit=crop",
     link_url: "",
-    price: 129.90,
-    total_quantity: 2
+    available_quantity: 2,
+    created_at: "10/03/2026 10:45:00"
   }
 ];
 
 const state = {
-  googleToken: localStorage.getItem("google_token") || "",
-  user: loadJson("user_profile", null),
-  guestName: localStorage.getItem("guest_name") || "",
+  guestName: localStorage.getItem("cha_guest_name") || "",
   products: [],
-  cart: loadJson("gift_cart", []),
-  myItems: []
+  draftReserved: loadJson("cha_draft_reserved", []),
+  myReservations: [],
+  isEntered: false
 };
 
 function byId(id) {
@@ -106,279 +108,131 @@ function saveJson(key, value) {
 
 function showAlert(message, type = "success") {
   const box = byId("alertBox");
-  box.className = `alert alert-${type}`;
+  box.className = `alert alert-${type} mt-4`;
   box.innerHTML = message;
   box.classList.remove("d-none");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function clearAlert() {
-  byId("alertBox").classList.add("d-none");
+  const box = byId("alertBox");
+  box.classList.add("d-none");
 }
 
-function formatCurrency(value) {
-  return Number(value || 0).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
-}
-
-function persistState() {
-  localStorage.setItem("google_token", state.googleToken || "");
-  localStorage.setItem("guest_name", state.guestName || "");
-  saveJson("user_profile", state.user || null);
-  saveJson("gift_cart", state.cart || []);
-}
-
-function isLoggedIn() {
-  return !!state.user?.email;
-}
-
-function requireLogin() {
-  if (!isLoggedIn()) {
-    showAlert("Faça login para continuar.", "warning");
-    return false;
-  }
-  if (!state.guestName?.trim()) {
-    showAlert("Informe seu nome antes de continuar.", "warning");
-    byId("guestNameInput").focus();
-    return false;
-  }
-  return true;
-}
-
-function getMockDb() {
-  const db = loadJson("mock_db", null);
+function getDb() {
+  const db = loadJson("cha_panela_db_v2", null);
   if (db) return db;
 
   const fresh = {
-    products: DEFAULT_PRODUCTS.map(item => ({ ...item })),
-    orderItems: []
+    products: DEFAULT_PRODUCTS.map((item, index) => ({
+      ...item,
+      id: index + 1
+    })),
+    reservations: []
   };
-  saveJson("mock_db", fresh);
+  saveJson("cha_panela_db_v2", fresh);
   return fresh;
 }
 
-function saveMockDb(db) {
-  saveJson("mock_db", db);
+function saveDb(db) {
+  saveJson("cha_panela_db_v2", db);
 }
 
-function computeMockProducts() {
-  const db = getMockDb();
-  return db.products
-    .map(product => {
-      const reserved = db.orderItems
-        .filter(item => Number(item.product_id) === Number(product.id))
-        .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-      return {
-        ...product,
-        reserved_quantity: reserved,
-        available_quantity: Number(product.total_quantity || 0) - reserved
-      };
-    })
-    .filter(item => item.available_quantity > 0);
+function persistUi() {
+  localStorage.setItem("cha_guest_name", state.guestName || "");
+  saveJson("cha_draft_reserved", state.draftReserved || []);
 }
 
-function computeMockMyItems(email) {
-  const db = getMockDb();
-  return db.orderItems
-    .filter(item => item.user_email === email)
+function parseDateString(str) {
+  const [datePart, timePart] = str.split(" ");
+  const [dd, mm, yyyy] = datePart.split("/").map(Number);
+  const [hh, mi, ss] = timePart.split(":").map(Number);
+  return new Date(yyyy, mm - 1, dd, hh, mi, ss).getTime();
+}
+
+function computeProducts() {
+  const db = getDb();
+  return db.products.map(product => {
+    const reserved = db.reservations
+      .filter(item => Number(item.product_id) === Number(product.id))
+      .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+
+    return {
+      ...product,
+      available_quantity: Math.max(0, Number(product.available_quantity) - reserved)
+    };
+  }).filter(item => item.available_quantity > 0);
+}
+
+function computeMyReservations() {
+  if (!state.guestName) return [];
+  const db = getDb();
+
+  return db.reservations
+    .filter(item => item.guest_name.toLowerCase() === state.guestName.toLowerCase())
     .map(item => {
       const product = db.products.find(p => Number(p.id) === Number(item.product_id));
       return {
-        order_item_id: item.id,
+        reservation_id: item.id,
         product_id: item.product_id,
-        product_name: product?.name || "Produto",
+        product_name: product?.name || "Presente",
+        category: product?.category || "",
         image_url: product?.image_url || "",
-        unit_price: Number(item.unit_price || 0),
+        link_url: product?.link_url || "",
         quantity: Number(item.quantity || 0),
-        guest_name: item.guest_name || "",
-        user_email: item.user_email
+        created_at: product?.created_at || ""
       };
     })
-    .sort((a, b) => b.order_item_id - a.order_item_id);
+    .sort((a, b) => b.reservation_id - a.reservation_id);
 }
 
-async function mockFetch(path, options = {}) {
-  const method = (options.method || "GET").toUpperCase();
-
-  if (path === "/api/products" && method === "GET") {
-    return computeMockProducts();
-  }
-
-  if (path === "/api/my-items" && method === "GET") {
-    return computeMockMyItems(state.user?.email || "");
-  }
-
-  if (path === "/api/auth/google" && method === "POST") {
-    const body = JSON.parse(options.body || "{}");
-    return {
-      ok: true,
-      user: {
-        email: body.email || "teste@exemplo.com",
-        name: body.name || "Convidado Teste",
-        picture: ""
-      }
-    };
-  }
-
-  if (path === "/api/checkout" && method === "POST") {
-    const body = JSON.parse(options.body || "{}");
-    const db = getMockDb();
-
-    if (!body.guest_name) {
-      throw new Error("Informe o nome do convidado.");
-    }
-
-    if (!Array.isArray(body.items) || !body.items.length) {
-      throw new Error("O carrinho está vazio.");
-    }
-
-    for (const item of body.items) {
-      const product = db.products.find(p => Number(p.id) === Number(item.product_id));
-      if (!product) throw new Error("Produto não encontrado.");
-
-      const reserved = db.orderItems
-        .filter(oi => Number(oi.product_id) === Number(product.id))
-        .reduce((sum, oi) => sum + Number(oi.quantity || 0), 0);
-      const available = Number(product.total_quantity || 0) - reserved;
-
-      if (Number(item.quantity || 0) > available) {
-        throw new Error(`O produto "${product.name}" não possui quantidade suficiente.`);
-      }
-    }
-
-    let nextId = db.orderItems.length ? Math.max(...db.orderItems.map(i => i.id)) + 1 : 1;
-
-    for (const item of body.items) {
-      const product = db.products.find(p => Number(p.id) === Number(item.product_id));
-      db.orderItems.push({
-        id: nextId++,
-        product_id: Number(item.product_id),
-        quantity: Number(item.quantity || 0),
-        unit_price: Number(product.price || 0),
-        user_email: state.user.email,
-        guest_name: body.guest_name,
-        user_name: state.user.name || ""
-      });
-    }
-
-    saveMockDb(db);
-    return { ok: true };
-  }
-
-  const patchMatch = path.match(/^\/api\/my-items\/(\d+)$/);
-
-  if (patchMatch && method === "PATCH") {
-    const body = JSON.parse(options.body || "{}");
-    const orderItemId = Number(patchMatch[1]);
-    const db = getMockDb();
-    const item = db.orderItems.find(i => Number(i.id) === orderItemId && i.user_email === state.user.email);
-
-    if (!item) throw new Error("Item não encontrado.");
-    const product = db.products.find(p => Number(p.id) === Number(item.product_id));
-    if (!product) throw new Error("Produto não encontrado.");
-
-    const totalReservedByOthers = db.orderItems
-      .filter(i => Number(i.product_id) === Number(item.product_id) && Number(i.id) !== orderItemId)
-      .reduce((sum, i) => sum + Number(i.quantity || 0), 0);
-
-    const maxAllowed = Number(product.total_quantity || 0) - totalReservedByOthers;
-    if (Number(body.quantity || 0) < 1 || Number(body.quantity || 0) > maxAllowed) {
-      throw new Error(`Quantidade acima do disponível para "${product.name}".`);
-    }
-
-    item.quantity = Number(body.quantity);
-    saveMockDb(db);
-    return { ok: true };
-  }
-
-  if (patchMatch && method === "DELETE") {
-    const orderItemId = Number(patchMatch[1]);
-    const db = getMockDb();
-    const before = db.orderItems.length;
-    db.orderItems = db.orderItems.filter(i => !(Number(i.id) === orderItemId && i.user_email === state.user.email));
-
-    if (db.orderItems.length === before) {
-      throw new Error("Item não encontrado para exclusão.");
-    }
-
-    saveMockDb(db);
-    return { ok: true };
-  }
-
-  throw new Error(`Rota mock não implementada: ${method} ${path}`);
-}
-
-async function apiFetch(path, options = {}) {
-  if (USE_MOCK) {
-    return await mockFetch(path, options);
-  }
-
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {})
-  };
-
-  if (state.googleToken) {
-    headers["Authorization"] = `Bearer ${state.googleToken}`;
-  }
-
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers
-  });
-
-  let payload = null;
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) {
-    payload = await response.json();
-  } else {
-    payload = await response.text();
-  }
-
-  if (!response.ok) {
-    const message = payload?.error || payload?.message || `Erro ${response.status}`;
-    throw new Error(message);
-  }
-
-  return payload;
+function updateCategories() {
+  const categories = Array.from(new Set(state.products.map(item => item.category))).sort();
+  const select = byId("categoryFilter");
+  const current = select.value;
+  select.innerHTML = `<option value="">Todas</option>` + categories.map(cat => `<option value="${cat}">${cat}</option>`).join("");
+  select.value = categories.includes(current) ? current : "";
 }
 
 function getFilteredProducts() {
   const term = byId("searchInput").value.trim().toLowerCase();
+  const category = byId("categoryFilter").value;
   const sort = byId("sortSelect").value;
 
-  let products = [...state.products].filter(product => Number(product.available_quantity || 0) > 0);
+  let products = [...state.products];
 
   if (term) {
-    products = products.filter(product => product.name.toLowerCase().includes(term));
+    products = products.filter(product =>
+      product.name.toLowerCase().includes(term) ||
+      product.category.toLowerCase().includes(term)
+    );
   }
 
-  if (sort === "name") {
+  if (category) {
+    products = products.filter(product => product.category === category);
+  }
+
+  if (sort === "id") {
+    products.sort((a, b) => Number(a.id) - Number(b.id));
+  } else if (sort === "name") {
     products.sort((a, b) => a.name.localeCompare(b.name));
-  } else if (sort === "priceAsc") {
-    products.sort((a, b) => Number(a.price) - Number(b.price));
-  } else if (sort === "priceDesc") {
-    products.sort((a, b) => Number(b.price) - Number(a.price));
+  } else if (sort === "dateAsc") {
+    products.sort((a, b) => parseDateString(a.created_at) - parseDateString(b.created_at));
+  } else if (sort === "dateDesc") {
+    products.sort((a, b) => parseDateString(b.created_at) - parseDateString(a.created_at));
   }
 
   return products;
 }
 
-function getCartCount() {
-  return state.cart.reduce((total, item) => total + Number(item.quantity || 0), 0);
+function renderHeader() {
+  byId("guestGreeting").textContent = state.guestName ? `Olá, ${state.guestName}` : "";
+  byId("changeNameBtn").classList.toggle("d-none", !state.guestName);
 }
 
-function getCartTotal() {
-  return state.cart.reduce((total, item) => total + Number(item.price) * Number(item.quantity || 0), 0);
-}
-
-function syncGuestName() {
-  byId("guestNameInput").value = state.guestName || "";
-  byId("userGreeting").textContent = state.user?.name ? `Olá, ${state.user.name}` : "";
-  byId("logoutBtn").classList.toggle("d-none", !isLoggedIn());
-  byId("mockLoginBtn").classList.toggle("d-none", isLoggedIn());
+function renderSections() {
+  byId("welcomeSection").classList.toggle("d-none", state.isEntered);
+  byId("giftsSection").classList.toggle("d-none", !state.isEntered);
 }
 
 function renderProducts() {
@@ -386,7 +240,7 @@ function renderProducts() {
   const grid = byId("productsGrid");
   const empty = byId("emptyProducts");
 
-  byId("availableCount").textContent = `${products.length} item(ns) disponível(is)`;
+  byId("availableCount").textContent = `${products.length} presente(s) disponível(is)`;
 
   if (!products.length) {
     grid.innerHTML = "";
@@ -396,61 +250,28 @@ function renderProducts() {
 
   empty.classList.add("d-none");
 
-  grid.innerHTML = products.map(product => {
-    const stock = Number(product.available_quantity || 0);
-    const linkHtml = product.link_url
-      ? `<a href="${product.link_url}" target="_blank" rel="noopener noreferrer" class="product-link small">Ver referência</a>`
-      : `<span class="small text-muted">Sem link externo</span>`;
-
-    return `
-      <div class="col-sm-6">
-        <div class="card product-card">
-          <img class="product-image" src="${product.image_url || ""}" alt="${product.name}">
-          <div class="card-body d-flex flex-column p-4">
-            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-              <h3 class="h5 mb-0">${product.name}</h3>
-              <span class="badge text-bg-light badge-stock">${stock} disp.</span>
-            </div>
-
-            ${product.description ? `<p class="text-muted small mb-2">${product.description}</p>` : `<div class="mb-2"></div>`}
-
-            <div class="fw-bold mb-2">${formatCurrency(product.price)}</div>
-            <div class="mb-3">${linkHtml}</div>
-
-            <div class="mt-auto d-grid">
-              <button class="btn btn-dark" onclick="addToCart('${product.id}')">Adicionar ao carrinho</button>
-            </div>
+  grid.innerHTML = products.map(product => `
+    <div class="col-sm-6">
+      <div class="card product-card">
+        <img class="product-image" src="${product.image_url}" alt="${product.name}">
+        <div class="card-body d-flex flex-column p-4">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <h3 class="h5 mb-0">${product.name}</h3>
+            <span class="badge text-bg-light id-badge">ID ${product.id}</span>
           </div>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
 
-function renderCart() {
-  const container = byId("cartItems");
-  byId("cartBadge").textContent = String(getCartCount());
-  byId("cartTotal").textContent = formatCurrency(getCartTotal());
+          <div class="product-meta text-muted mb-1"><strong>Categoria:</strong> ${product.category}</div>
+          <div class="product-meta text-muted mb-1"><strong>Data:</strong> ${product.created_at}</div>
+          <div class="product-meta text-muted mb-2"><strong>Disponível:</strong> ${product.available_quantity}</div>
+          ${product.description ? `<p class="text-muted small mb-2">${product.description}</p>` : ""}
+          <div class="small mb-3">
+            ${product.link_url ? `<a href="${product.link_url}" target="_blank" rel="noopener noreferrer">Ver referência externa</a>` : '<span class="text-muted">Sem link externo</span>'}
+          </div>
 
-  if (!state.cart.length) {
-    container.innerHTML = '<p class="text-muted mb-0">Seu carrinho está vazio.</p>';
-    return;
-  }
-
-  container.innerHTML = state.cart.map(item => `
-    <div class="line-item border rounded-4 p-3">
-      <div class="d-flex gap-3">
-        <img class="small-photo" src="${item.image_url || ""}" alt="${item.name}">
-        <div class="flex-grow-1">
-          <div class="fw-semibold">${item.name}</div>
-          <div class="small text-muted">${formatCurrency(item.price)} cada</div>
-          <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
-            <div class="qty-pill">
-              <button onclick="changeCartQuantity('${item.id}', -1)">-</button>
-              <span>${item.quantity}</span>
-              <button onclick="changeCartQuantity('${item.id}', 1)">+</button>
-            </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart('${item.id}')">Remover</button>
+          <div class="mt-auto d-grid">
+            <button class="btn btn-dark touch-btn add-gift-btn" data-product-id="${product.id}" type="button">
+              Adicionar à minha lista de carinho
+            </button>
           </div>
         </div>
       </div>
@@ -458,29 +279,61 @@ function renderCart() {
   `).join("");
 }
 
-function renderMyItems() {
-  const container = byId("myItems");
-  byId("myItemsBadge").textContent = String(state.myItems.length);
+function renderDraftReserved() {
+  const container = byId("reservedItems");
+  byId("reservedBadge").textContent = String(state.draftReserved.reduce((sum, item) => sum + Number(item.quantity || 0), 0));
 
-  if (!state.myItems.length) {
+  if (!state.draftReserved.length) {
     container.innerHTML = '<p class="text-muted mb-0">Você ainda não reservou presentes.</p>';
     return;
   }
 
-  container.innerHTML = state.myItems.map(item => `
+  container.innerHTML = state.draftReserved.map(item => `
     <div class="line-item border rounded-4 p-3">
       <div class="d-flex gap-3">
-        <img class="small-photo" src="${item.image_url || ""}" alt="${item.product_name}">
+        <img class="small-photo" src="${item.image_url}" alt="${item.name}">
+        <div class="flex-grow-1">
+          <div class="fw-semibold">${item.name}</div>
+          <div class="small text-muted">ID ${item.id} • ${item.category}</div>
+          <div class="small text-muted">${item.created_at}</div>
+          <div class="d-flex justify-content-between align-items-center mt-3 gap-2 flex-wrap">
+            <div class="qty-pill">
+              <button type="button" class="draft-qty-btn" data-action="minus" data-product-id="${item.id}">-</button>
+              <span>${item.quantity}</span>
+              <button type="button" class="draft-qty-btn" data-action="plus" data-product-id="${item.id}">+</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-draft-btn" data-product-id="${item.id}">Remover</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderMyReservations() {
+  const container = byId("myItems");
+  byId("myItemsBadge").textContent = String(state.myReservations.length);
+
+  if (!state.myReservations.length) {
+    container.innerHTML = '<p class="text-muted mb-0">Nenhum presente reservado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = state.myReservations.map(item => `
+    <div class="line-item border rounded-4 p-3">
+      <div class="d-flex gap-3">
+        <img class="small-photo" src="${item.image_url}" alt="${item.product_name}">
         <div class="flex-grow-1">
           <div class="fw-semibold">${item.product_name}</div>
-          <div class="small text-muted">${formatCurrency(item.unit_price)} cada</div>
-          <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
+          <div class="small text-muted">ID ${item.product_id} • ${item.category}</div>
+          <div class="small text-muted">${item.created_at}</div>
+          <div class="d-flex justify-content-between align-items-center mt-3 gap-2 flex-wrap">
             <div class="qty-pill">
-              <button onclick="updateMyItemQuantity(${item.order_item_id}, ${item.quantity - 1})">-</button>
+              <button type="button" class="my-qty-btn" data-action="minus" data-reservation-id="${item.reservation_id}">-</button>
               <span>${item.quantity}</span>
-              <button onclick="updateMyItemQuantity(${item.order_item_id}, ${item.quantity + 1})">+</button>
+              <button type="button" class="my-qty-btn" data-action="plus" data-reservation-id="${item.reservation_id}">+</button>
             </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="deleteMyItem(${item.order_item_id})">Excluir</button>
+            <button type="button" class="btn btn-sm btn-outline-danger remove-my-btn" data-reservation-id="${item.reservation_id}">Excluir</button>
           </div>
         </div>
       </div>
@@ -489,320 +342,333 @@ function renderMyItems() {
 }
 
 function renderAll() {
-  syncGuestName();
+  renderHeader();
+  renderSections();
   renderProducts();
-  renderCart();
-  renderMyItems();
+  renderDraftReserved();
+  renderMyReservations();
 }
 
-async function loadProducts() {
-  state.products = await apiFetch("/api/products");
-  renderProducts();
-}
-
-async function loadMyItems() {
-  if (!isLoggedIn()) {
-    state.myItems = [];
-    renderMyItems();
-    return;
-  }
-  state.myItems = await apiFetch("/api/my-items");
-  renderMyItems();
-}
-
-function addToCart(productId) {
+function enterWithName() {
   clearAlert();
-  if (!requireLogin()) return;
+  const name = byId("guestNameInput").value.trim();
 
-  const product = state.products.find(item => String(item.id) === String(productId));
-  if (!product) {
-    showAlert("Produto não encontrado.", "warning");
+  if (!name) {
+    showAlert("Informe seu nome para continuar.", "warning");
     return;
   }
 
-  const available = Number(product.available_quantity || 0);
-  const existing = state.cart.find(item => String(item.id) === String(productId));
-  const cartQty = existing ? Number(existing.quantity || 0) : 0;
+  state.guestName = name;
+  state.isEntered = true;
+  state.myReservations = computeMyReservations();
+  persistUi();
+  renderAll();
+}
 
-  if (cartQty + 1 > available) {
-    showAlert("A quantidade no carrinho excede o disponível.", "warning");
+function changeName() {
+  state.guestName = "";
+  state.isEntered = false;
+  state.draftReserved = [];
+  state.myReservations = [];
+  persistUi();
+  byId("guestNameInput").value = "";
+  renderAll();
+}
+
+function addGift(productId) {
+  clearAlert();
+  if (!state.guestName) {
+    showAlert("Informe seu nome antes de reservar presentes.", "warning");
+    return;
+  }
+
+  const product = state.products.find(item => Number(item.id) === Number(productId));
+  if (!product) {
+    showAlert("Presente não encontrado.", "warning");
+    return;
+  }
+
+  const existing = state.draftReserved.find(item => Number(item.id) === Number(productId));
+  const currentDraftQty = existing ? Number(existing.quantity || 0) : 0;
+
+  if (currentDraftQty + 1 > Number(product.available_quantity || 0)) {
+    showAlert("A quantidade na sua lista excede o disponível.", "warning");
     return;
   }
 
   if (existing) {
     existing.quantity += 1;
   } else {
-    state.cart.push({
+    state.draftReserved.push({
       id: product.id,
       name: product.name,
-      price: Number(product.price),
+      category: product.category,
       quantity: 1,
-      image_url: product.image_url || ""
+      image_url: product.image_url,
+      created_at: product.created_at
     });
   }
 
-  persistState();
-  renderCart();
+  persistUi();
+  renderDraftReserved();
+  showAlert("Presente adicionado à sua lista de carinho.", "success");
 }
 
-function changeCartQuantity(productId, delta) {
-  const item = state.cart.find(entry => String(entry.id) === String(productId));
+function changeDraftQuantity(productId, delta) {
+  const item = state.draftReserved.find(entry => Number(entry.id) === Number(productId));
   if (!item) return;
 
-  const product = state.products.find(entry => String(entry.id) === String(productId));
-  const available = Number(product?.available_quantity || 0);
+  const product = state.products.find(entry => Number(entry.id) === Number(productId));
+  const maxAvailable = Number(product?.available_quantity || 0);
 
   item.quantity += delta;
 
   if (item.quantity <= 0) {
-    state.cart = state.cart.filter(entry => String(entry.id) !== String(productId));
-  } else if (item.quantity > available) {
-    item.quantity = available;
+    state.draftReserved = state.draftReserved.filter(entry => Number(entry.id) !== Number(productId));
+  } else if (item.quantity > maxAvailable) {
+    item.quantity = maxAvailable;
     showAlert("A quantidade foi ajustada para o máximo disponível.", "warning");
   }
 
-  persistState();
-  renderCart();
+  persistUi();
+  renderDraftReserved();
 }
 
-function removeFromCart(productId) {
-  state.cart = state.cart.filter(entry => String(entry.id) !== String(productId));
-  persistState();
-  renderCart();
+function removeDraftItem(productId) {
+  state.draftReserved = state.draftReserved.filter(entry => Number(entry.id) !== Number(productId));
+  persistUi();
+  renderDraftReserved();
 }
 
-function clearCart() {
-  state.cart = [];
-  persistState();
-  renderCart();
+function clearDraftList() {
+  state.draftReserved = [];
+  persistUi();
+  renderDraftReserved();
+  showAlert("Sua lista de carinho foi limpa.", "secondary");
 }
 
-async function checkout() {
+function confirmReservation() {
   clearAlert();
-  if (!requireLogin()) return;
-
-  if (!state.cart.length) {
-    showAlert("Seu carrinho está vazio.", "warning");
-    return;
-  }
-
-  try {
-    await apiFetch("/api/checkout", {
-      method: "POST",
-      body: JSON.stringify({
-        guest_name: state.guestName,
-        items: state.cart.map(item => ({
-          product_id: item.id,
-          quantity: item.quantity
-        }))
-      })
-    });
-
-    state.cart = [];
-    persistState();
-
-    await Promise.all([loadProducts(), loadMyItems()]);
-    renderCart();
-    showAlert("Seleção concluída com sucesso.");
-  } catch (error) {
-    showAlert(error.message || "Não foi possível concluir a seleção.", "danger");
-  }
-}
-
-async function updateMyItemQuantity(orderItemId, newQuantity) {
-  clearAlert();
-  if (!requireLogin()) return;
-
-  if (newQuantity <= 0) {
-    await deleteMyItem(orderItemId);
-    return;
-  }
-
-  try {
-    await apiFetch(`/api/my-items/${orderItemId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ quantity: newQuantity })
-    });
-
-    await Promise.all([loadProducts(), loadMyItems()]);
-    showAlert("Quantidade atualizada com sucesso.");
-  } catch (error) {
-    showAlert(error.message || "Não foi possível atualizar a quantidade.", "danger");
-  }
-}
-
-async function deleteMyItem(orderItemId) {
-  clearAlert();
-  if (!requireLogin()) return;
-
-  try {
-    await apiFetch(`/api/my-items/${orderItemId}`, {
-      method: "DELETE"
-    });
-
-    await Promise.all([loadProducts(), loadMyItems()]);
-    showAlert("Item removido com sucesso.");
-  } catch (error) {
-    showAlert(error.message || "Não foi possível remover o item.", "danger");
-  }
-}
-
-function saveGuestName() {
-  state.guestName = byId("guestNameInput").value.trim();
-  persistState();
-  showAlert("Nome salvo com sucesso.");
-}
-
-async function handleGoogleCredential(response) {
-  clearAlert();
-
-  try {
-    const result = await apiFetch("/api/auth/google", {
-      method: "POST",
-      body: JSON.stringify({
-        credential: response.credential
-      })
-    });
-
-    state.googleToken = response.credential;
-    state.user = {
-      email: result.user.email,
-      name: result.user.name,
-      picture: result.user.picture || ""
-    };
-
-    persistState();
-
-    await Promise.all([loadProducts(), loadMyItems()]);
-    renderAll();
-    showAlert("Login realizado com sucesso.");
-  } catch (error) {
-    showAlert(error.message || "Falha no login com Google.", "danger");
-  }
-}
-
-async function mockLogin() {
-  clearAlert();
-  const email = prompt("Digite um e-mail para testar:", state.user?.email || "teste@exemplo.com");
-  if (!email) return;
-
-  const name = prompt("Digite o nome do convidado:", state.user?.name || "Convidado Teste");
-  if (!name) return;
-
-  const result = await apiFetch("/api/auth/google", {
-    method: "POST",
-    body: JSON.stringify({ email, name })
-  });
-
-  state.googleToken = "mock-token";
-  state.user = {
-    email: result.user.email,
-    name: result.user.name,
-    picture: ""
-  };
 
   if (!state.guestName) {
-    state.guestName = result.user.name;
+    showAlert("Informe seu nome antes de continuar.", "warning");
+    return;
   }
 
-  persistState();
-  await Promise.all([loadProducts(), loadMyItems()]);
+  if (!state.draftReserved.length) {
+    showAlert("Sua lista de carinho está vazia.", "warning");
+    return;
+  }
+
+  const db = getDb();
+
+  for (const draft of state.draftReserved) {
+    const product = computeProducts().find(p => Number(p.id) === Number(draft.id));
+    if (!product || Number(draft.quantity) > Number(product.available_quantity || 0)) {
+      showAlert(`O presente "${draft.name}" não possui mais quantidade suficiente.`, "danger");
+      state.products = computeProducts();
+      renderProducts();
+      return;
+    }
+  }
+
+  let nextId = db.reservations.length ? Math.max(...db.reservations.map(item => item.id)) + 1 : 1;
+
+  for (const draft of state.draftReserved) {
+    db.reservations.push({
+      id: nextId++,
+      product_id: draft.id,
+      guest_name: state.guestName,
+      quantity: draft.quantity
+    });
+  }
+
+  saveDb(db);
+  state.draftReserved = [];
+  state.products = computeProducts();
+  state.myReservations = computeMyReservations();
+  persistUi();
   renderAll();
-  showAlert('Login mock realizado com sucesso. <span class="badge text-bg-warning mode-pill ms-2">MODO MOCK</span>');
+  showAlert("Reserva confirmada com sucesso. Muito obrigado pelo carinho!", "success");
 }
 
-function logout() {
-  state.googleToken = "";
-  state.user = null;
-  state.myItems = [];
-  state.cart = [];
-  persistState();
-  renderAll();
+function updateMyReservation(reservationId, delta) {
+  clearAlert();
+  const db = getDb();
+  const reservation = db.reservations.find(item => Number(item.id) === Number(reservationId) && item.guest_name.toLowerCase() === state.guestName.toLowerCase());
 
-  if (window.google?.accounts?.id) {
-    window.google.accounts.id.disableAutoSelect();
+  if (!reservation) {
+    showAlert("Reserva não encontrada.", "warning");
+    return;
   }
 
-  showAlert("Você saiu da sua conta.", "secondary");
+  const product = db.products.find(item => Number(item.id) === Number(reservation.product_id));
+  if (!product) return;
+
+  const reservedByOthers = db.reservations
+    .filter(item => Number(item.product_id) === Number(reservation.product_id) && Number(item.id) !== Number(reservationId))
+    .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+
+  const maxForUser = Number(product.available_quantity) - reservedByOthers;
+  const nextQty = Number(reservation.quantity) + delta;
+
+  if (nextQty <= 0) {
+    db.reservations = db.reservations.filter(item => Number(item.id) !== Number(reservationId));
+    saveDb(db);
+    state.products = computeProducts();
+    state.myReservations = computeMyReservations();
+    renderAll();
+    showAlert("Reserva removida com sucesso.", "secondary");
+    return;
+  }
+
+  if (nextQty > maxForUser) {
+    showAlert("Quantidade acima do disponível.", "warning");
+    return;
+  }
+
+  reservation.quantity = nextQty;
+  saveDb(db);
+  state.products = computeProducts();
+  state.myReservations = computeMyReservations();
+  renderAll();
+  showAlert("Quantidade atualizada com sucesso.", "success");
 }
 
-function initGoogleLogin() {
-  if (USE_MOCK) {
-    byId("googleLoginContainer").classList.add("d-none");
-    return;
-  }
+function removeMyReservation(reservationId) {
+  const db = getDb();
+  db.reservations = db.reservations.filter(item => !(Number(item.id) === Number(reservationId) && item.guest_name.toLowerCase() === state.guestName.toLowerCase()));
+  saveDb(db);
+  state.products = computeProducts();
+  state.myReservations = computeMyReservations();
+  renderAll();
+  showAlert("Reserva excluída com sucesso.", "secondary");
+}
 
-  byId("mockLoginBtn").classList.add("d-none");
+function attachEventDelegation() {
+  document.addEventListener("click", function (event) {
+    const addBtn = event.target.closest(".add-gift-btn");
+    if (addBtn) {
+      event.preventDefault();
+      addGift(addBtn.dataset.productId);
+      return;
+    }
 
-  if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes("SEU_GOOGLE_CLIENT_ID")) {
-    showAlert("Configure o GOOGLE_CLIENT_ID no arquivo config.js para habilitar o login.", "warning");
-    return;
-  }
+    const draftBtn = event.target.closest(".draft-qty-btn");
+    if (draftBtn) {
+      event.preventDefault();
+      const delta = draftBtn.dataset.action === "plus" ? 1 : -1;
+      changeDraftQuantity(draftBtn.dataset.productId, delta);
+      return;
+    }
 
-  if (!window.google?.accounts?.id) {
-    setTimeout(initGoogleLogin, 500);
-    return;
-  }
+    const removeDraftBtn = event.target.closest(".remove-draft-btn");
+    if (removeDraftBtn) {
+      event.preventDefault();
+      removeDraftItem(removeDraftBtn.dataset.productId);
+      return;
+    }
 
-  byId("googleLoginContainer").classList.remove("d-none");
+    const myQtyBtn = event.target.closest(".my-qty-btn");
+    if (myQtyBtn) {
+      event.preventDefault();
+      const delta = myQtyBtn.dataset.action === "plus" ? 1 : -1;
+      updateMyReservation(myQtyBtn.dataset.reservationId, delta);
+      return;
+    }
 
-  window.google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleGoogleCredential,
-    auto_select: false,
-    cancel_on_tap_outside: true
+    const removeMyBtn = event.target.closest(".remove-my-btn");
+    if (removeMyBtn) {
+      event.preventDefault();
+      removeMyReservation(removeMyBtn.dataset.reservationId);
+    }
   });
-
-  window.google.accounts.id.renderButton(
-    byId("googleLoginContainer"),
-    { theme: "outline", size: "medium", shape: "pill", text: "signin_with", width: 220 }
-  );
 }
 
-function resetMockData() {
-  localStorage.removeItem("mock_db");
-  localStorage.removeItem("gift_cart");
-  localStorage.removeItem("guest_name");
-  localStorage.removeItem("google_token");
-  localStorage.removeItem("user_profile");
+function resetAllData() {
+  localStorage.removeItem("cha_panela_db_v2");
+  localStorage.removeItem("cha_guest_name");
+  localStorage.removeItem("cha_draft_reserved");
   location.reload();
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  byId("guestNameInput").value = state.guestName || "";
-  byId("saveNameBtn").addEventListener("click", saveGuestName);
-  byId("searchInput").addEventListener("input", renderProducts);
-  byId("sortSelect").addEventListener("change", renderProducts);
-  byId("checkoutBtn").addEventListener("click", checkout);
-  byId("clearCartBtn").addEventListener("click", clearCart);
-  byId("logoutBtn").addEventListener("click", logout);
-  byId("mockLoginBtn").addEventListener("click", mockLogin);
+document.addEventListener("DOMContentLoaded", function () {
+  state.products = computeProducts();
+  state.myReservations = computeMyReservations();
+  state.isEntered = !!state.guestName;
 
-  initGoogleLogin();
+  const guestNameInput = byId("guestNameInput");
+  const enterBtn = byId("enterBtn");
+  const changeNameBtn = byId("changeNameBtn");
+  const saveNameBtn = byId("saveNameBtn");
+  const searchInput = byId("searchInput");
+  const categoryFilter = byId("categoryFilter");
+  const sortSelect = byId("sortSelect");
+  const confirmBtn = byId("confirmBtn");
+  const clearReservedBtn = byId("clearReservedBtn");
 
-  try {
-    await loadProducts();
-    if (isLoggedIn()) {
-      await loadMyItems();
-    }
-    renderAll();
+  if (guestNameInput) {
+    guestNameInput.value = state.guestName || "";
+    guestNameInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        enterWithName();
+      }
+    });
+  }
 
-    if (USE_MOCK) {
-      showAlert(
-        'Site pronto para localhost em <strong>modo mock</strong>. ' +
-        'Use o botão <strong>Entrar para testar</strong>. ' +
-        'Para zerar tudo, rode no console: <code>resetMockData()</code>.',
-        "info"
-      );
-    }
-  } catch (error) {
-    showAlert(error.message || "Erro ao carregar dados iniciais.", "danger");
+  if (enterBtn) {
+    enterBtn.addEventListener("click", enterWithName);
+  }
+
+  if (changeNameBtn) {
+    changeNameBtn.addEventListener("click", changeName);
+  }
+
+  if (saveNameBtn) {
+    saveNameBtn.addEventListener("click", function () {
+      const value = guestNameInput ? guestNameInput.value.trim() : "";
+      if (!value) {
+        showAlert("Informe seu nome.", "warning");
+        return;
+      }
+      state.guestName = value;
+      state.myReservations = computeMyReservations();
+      persistUi();
+      renderAll();
+      showAlert("Nome atualizado com sucesso.", "success");
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", renderProducts);
+  }
+
+  if (categoryFilter) {
+    categoryFilter.addEventListener("change", renderProducts);
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", renderProducts);
+  }
+
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", confirmReservation);
+  }
+
+  if (clearReservedBtn) {
+    clearReservedBtn.addEventListener("click", clearDraftList);
+  }
+
+  updateCategories();
+  attachEventDelegation();
+  renderAll();
+
+  if (state.isEntered) {
+    showAlert(
+      'Você entrou como <strong>' + state.guestName + '</strong>. Para zerar todos os dados locais, use <code>resetAllData()</code> no console.',
+      "info"
+    );
   }
 });
 
-window.addToCart = addToCart;
-window.changeCartQuantity = changeCartQuantity;
-window.removeFromCart = removeFromCart;
-window.updateMyItemQuantity = updateMyItemQuantity;
-window.deleteMyItem = deleteMyItem;
-window.resetMockData = resetMockData;
+window.resetAllData = resetAllData;

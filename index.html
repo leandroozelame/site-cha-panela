@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chá de Panela | Lista de Presentes</title>
-  <meta name="description" content="Lista de presentes do chá de panela" />
+  <title>Chá de Panela | Leandro & Gabriella</title>
+  <meta name="description" content="Lista de presentes do chá de panela de Leandro e Gabriella" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,122 +14,134 @@
 <body>
   <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
     <div class="container py-2">
-      <a class="navbar-brand fw-bold" href="#">Chá de Panela</a>
-      <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
-        <span id="userGreeting" class="small text-muted d-none d-md-inline"></span>
-        <div id="googleLoginContainer" class="d-none"></div>
-        <button id="mockLoginBtn" class="btn btn-dark btn-sm">Entrar para testar</button>
-        <button id="logoutBtn" class="btn btn-outline-secondary btn-sm d-none">Sair</button>
+      <a class="navbar-brand fw-bold" href="#">Leandro & Gabriella</a>
+      <div class="d-flex align-items-center gap-2">
+        <span id="guestGreeting" class="small text-muted"></span>
+        <button id="changeNameBtn" class="btn btn-outline-secondary btn-sm d-none">Trocar nome</button>
       </div>
     </div>
   </nav>
 
   <main class="container py-4 py-md-5">
-    <section class="hero-card mb-4 mb-md-5">
-      <div class="row g-4 align-items-center">
-        <div class="col-lg-7">
-          <p class="text-uppercase text-secondary fw-semibold small mb-2">Lista de presentes</p>
-          <h1 class="display-6 fw-bold mb-3">Escolha seus presentes com carinho</h1>
-          <p class="lead mb-0">
-            Faça login, informe seu nome e selecione um ou mais itens.
-            No modo mock, tudo já funciona localmente no navegador para você testar sem backend.
-          </p>
+    <section id="welcomeSection" class="welcome-wrap">
+      <div class="row g-4 align-items-stretch">
+        <div class="col-xl-7">
+          <div class="hero-card hero-text-card h-100">
+            <p class="text-uppercase text-secondary fw-semibold small mb-2">Chá de Panela</p>
+            <h1 class="display-5 fw-bold mb-3">Bem-vindo ao chá de panela de Leandro & Gabriella</h1>
+            <p class="lead mb-3">
+              Preparamos esta lista com muito carinho para tornar esse momento ainda mais especial.
+              Aqui você pode escolher um ou mais presentes, reservar no seu nome e nos ajudar a montar nosso novo lar.
+            </p>
+            <p class="mb-4 text-secondary">
+              Leia o convite ao lado e, quando estiver pronto, informe seu nome para abrir a lista de presentes disponíveis.
+            </p>
+
+            <div class="card section-card border-0 intro-form-card">
+              <div class="card-body p-4">
+                <label for="guestNameInput" class="form-label fw-semibold">Seu nome</label>
+                <input id="guestNameInput" type="text" class="form-control mb-3" placeholder="Ex.: Maria Souza">
+                <div class="d-grid gap-2">
+                  <button id="enterBtn" class="btn btn-dark btn-lg">Ver presentes disponíveis</button>
+                </div>
+                <div class="small text-muted mt-3">
+                  Não é necessário login com Google nem e-mail. Basta informar seu nome.
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-lg-5">
-          <div class="card section-card border-0 h-100">
-            <div class="card-body p-4">
-              <label for="guestNameInput" class="form-label fw-semibold">Seu nome para identificação</label>
-              <input id="guestNameInput" type="text" class="form-control mb-3" placeholder="Ex.: Maria Souza">
-              <div class="d-grid gap-2">
-                <button id="saveNameBtn" class="btn btn-dark">Salvar nome</button>
-              </div>
-              <div class="small text-muted mt-3">
-                Esse nome será salvo junto aos presentes reservados.
-              </div>
+
+        <div class="col-xl-5">
+          <div class="hero-card hero-image-card h-100">
+            <div class="invite-frame">
+              <img src="./convite-cha-panela.png" alt="Convite do chá de panela de Leandro e Gabriella" class="invite-image">
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <div id="alertBox" class="alert d-none" role="alert"></div>
+    <section id="giftsSection" class="d-none">
+      <div id="alertBox" class="alert d-none mt-4" role="alert"></div>
 
-    <div class="row g-4">
-      <div class="col-lg-8">
-        <section class="card section-card border-0 mb-4">
-          <div class="card-body p-4">
-            <div class="row g-3 align-items-end">
-              <div class="col-md-8">
-                <label class="form-label fw-semibold">Pesquisar produto</label>
-                <input id="searchInput" type="text" class="form-control" placeholder="Digite o nome do produto">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label fw-semibold">Ordenar por</label>
-                <select id="sortSelect" class="form-select">
-                  <option value="name">Nome</option>
-                  <option value="priceAsc">Menor valor</option>
-                  <option value="priceDesc">Maior valor</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h4 mb-0">Produtos disponíveis</h2>
-            <span id="availableCount" class="text-muted small"></span>
-          </div>
-          <div id="productsGrid" class="row g-4"></div>
-          <div id="emptyProducts" class="alert alert-light border d-none mt-3 mb-0">
-            Nenhum produto encontrado.
-          </div>
-        </section>
-      </div>
-
-      <div class="col-lg-4">
-        <div class="sticky-summary">
+      <div class="row g-4 mt-1">
+        <div class="col-lg-8">
           <section class="card section-card border-0 mb-4">
             <div class="card-body p-4">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 mb-0">Carrinho</h2>
-                <span id="cartBadge" class="badge text-bg-dark">0</span>
-              </div>
-
-              <div id="cartItems">
-                <p class="text-muted mb-0">Seu carrinho está vazio.</p>
-              </div>
-
-              <div class="d-flex justify-content-between fw-semibold border-top pt-3 mt-3">
-                <span>Total</span>
-                <span id="cartTotal">R$ 0,00</span>
-              </div>
-
-              <div class="d-grid gap-2 mt-3">
-                <button id="checkoutBtn" class="btn btn-dark">Confirmar seleção</button>
-                <button id="clearCartBtn" class="btn btn-outline-secondary">Limpar carrinho</button>
+              <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                  <label class="form-label fw-semibold">Pesquisar presente</label>
+                  <input id="searchInput" type="text" class="form-control" placeholder="Digite o nome do produto">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Categoria</label>
+                  <select id="categoryFilter" class="form-select">
+                    <option value="">Todas</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-semibold">Ordenar por</label>
+                  <select id="sortSelect" class="form-select">
+                    <option value="id">ID</option>
+                    <option value="name">Nome</option>
+                    <option value="dateAsc">Data mais antiga</option>
+                    <option value="dateDesc">Data mais recente</option>
+                  </select>
+                </div>
               </div>
             </div>
           </section>
 
-          <section class="card section-card border-0">
-            <div class="card-body p-4">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 mb-0">Meus presentes</h2>
-                <span id="myItemsBadge" class="badge text-bg-secondary">0</span>
-              </div>
-              <div id="myItems">
-                <p class="text-muted mb-0">Você ainda não reservou presentes.</p>
-              </div>
+          <section>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h4 mb-0">Presentes disponíveis</h2>
+              <span id="availableCount" class="text-muted small"></span>
+            </div>
+            <div id="productsGrid" class="row g-4"></div>
+            <div id="emptyProducts" class="alert alert-light border d-none mt-3 mb-0">
+              Nenhum presente encontrado.
             </div>
           </section>
         </div>
+
+        <div class="col-lg-4">
+          <div class="sticky-summary">
+            <section class="card section-card border-0 mb-4">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="h5 mb-0">Minha lista de carinho</h2>
+                  <span id="reservedBadge" class="badge text-bg-dark">0</span>
+                </div>
+
+                <div id="reservedItems">
+                  <p class="text-muted mb-0">Você ainda não reservou presentes.</p>
+                </div>
+
+                <div class="d-grid gap-2 mt-3">
+                  <button id="confirmBtn" class="btn btn-dark">Confirmar reserva</button>
+                  <button id="clearReservedBtn" class="btn btn-outline-secondary">Limpar lista</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="card section-card border-0">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="h5 mb-0">Reservados por você</h2>
+                  <span id="myItemsBadge" class="badge text-bg-secondary">0</span>
+                </div>
+                <div id="myItems">
+                  <p class="text-muted mb-0">Nenhum presente reservado ainda.</p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   </main>
 
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="./config.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

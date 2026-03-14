@@ -1,23 +1,22 @@
-# Chá de Panela completo com modo mock
+# Chá de Panela - Leandro & Gabriella
 
-Este pacote foi ajustado para funcionar de dois jeitos:
+Versão atualizada para usar a imagem do convite na tela de boas-vindas.
 
-## 1. Modo mock local, pronto para testar
-Nesse modo você não precisa de Cloudflare, banco, Google login nem API.
+## O que foi ajustado
+- a imagem enviada foi incorporada na tela inicial
+- layout em duas colunas no desktop:
+  - texto + entrada do nome
+  - convite em destaque
+- no mobile a imagem fica bem encaixada em cima/baixo com moldura suave
+- sem preço
+- com data no formato `dd/mm/yyyy hh:mm:ss`
+- itens com ID sequencial
+- entrada apenas com nome
+- lista com imagem, categoria, nome, quantidade disponível e link externo
+- nome íntimo para seleção: `Minha lista de carinho`
 
-O arquivo `config.js` já vem assim:
-
-```js
-window.APP_CONFIG = {
-  USE_MOCK: true,
-  API_BASE_URL: "http://127.0.0.1:8787",
-  GOOGLE_CLIENT_ID: "SEU_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-};
-```
-
-### Como rodar local em 1 minuto
-
-Na pasta do projeto, rode:
+## Como rodar
+Na pasta do projeto:
 
 ```powershell
 python -m http.server 8080
@@ -29,74 +28,9 @@ Depois abra:
 http://localhost:8080
 ```
 
-Clique em:
-- `Entrar para testar`
+## Resetar tudo
+No console do navegador:
 
-Informe:
-- e-mail qualquer
-- nome qualquer
-
-Pronto. Você já consegue:
-- pesquisar produtos
-- adicionar ao carrinho
-- confirmar seleção
-- ver o item sumir da lista disponível
-- ver em "Meus presentes"
-- alterar quantidade
-- excluir item
-
-Tudo fica salvo no `localStorage` do navegador.
-
-### Resetar os dados mock
-Abra o console do navegador e rode:
-
-```js
-resetMockData()
+```javascript
+resetAllData()
 ```
-
-## 2. Modo real com Cloudflare Worker + D1 + Google Login
-
-Quando quiser sair do modo mock:
-
-### config.js
-Troque para:
-
-```js
-window.APP_CONFIG = {
-  USE_MOCK: false,
-  API_BASE_URL: "http://127.0.0.1:8787",
-  GOOGLE_CLIENT_ID: "SEU_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-};
-```
-
-### Subir banco local
-```powershell
-wrangler d1 execute cha-panela-db --local --file=schema.sql
-wrangler d1 execute cha-panela-db --local --file=seed.sql
-```
-
-### Rodar API local
-```powershell
-wrangler dev
-```
-
-### Rodar frontend
-```powershell
-python -m http.server 8080
-```
-
-## Arquivos
-- `index.html`
-- `styles.css`
-- `config.js`
-- `app.js`
-- `worker.js`
-- `schema.sql`
-- `seed.sql`
-- `wrangler.toml`
-
-## Observações
-- O modo mock é ideal para aprovar layout e fluxo rapidamente.
-- O login mock usa prompts simples.
-- O modo real continua disponível no mesmo pacote.
-- O frontend foi feito em HTML + Bootstrap + JavaScript puro.
