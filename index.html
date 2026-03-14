@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chá de Panela | Lista de Presentes</title>
+  <meta name="description" content="Lista de presentes do chá de panela" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
+    <div class="container py-2">
+      <a class="navbar-brand fw-bold" href="#">Chá de Panela</a>
+      <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+        <span id="userGreeting" class="small text-muted d-none d-md-inline"></span>
+        <div id="googleLoginContainer" class="d-none"></div>
+        <button id="mockLoginBtn" class="btn btn-dark btn-sm">Entrar para testar</button>
+        <button id="logoutBtn" class="btn btn-outline-secondary btn-sm d-none">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4 py-md-5">
+    <section class="hero-card mb-4 mb-md-5">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+          <p class="text-uppercase text-secondary fw-semibold small mb-2">Lista de presentes</p>
+          <h1 class="display-6 fw-bold mb-3">Escolha seus presentes com carinho</h1>
+          <p class="lead mb-0">
+            Faça login, informe seu nome e selecione um ou mais itens.
+            No modo mock, tudo já funciona localmente no navegador para você testar sem backend.
+          </p>
+        </div>
+        <div class="col-lg-5">
+          <div class="card section-card border-0 h-100">
+            <div class="card-body p-4">
+              <label for="guestNameInput" class="form-label fw-semibold">Seu nome para identificação</label>
+              <input id="guestNameInput" type="text" class="form-control mb-3" placeholder="Ex.: Maria Souza">
+              <div class="d-grid gap-2">
+                <button id="saveNameBtn" class="btn btn-dark">Salvar nome</button>
+              </div>
+              <div class="small text-muted mt-3">
+                Esse nome será salvo junto aos presentes reservados.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="alertBox" class="alert d-none" role="alert"></div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <section class="card section-card border-0 mb-4">
+          <div class="card-body p-4">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-8">
+                <label class="form-label fw-semibold">Pesquisar produto</label>
+                <input id="searchInput" type="text" class="form-control" placeholder="Digite o nome do produto">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Ordenar por</label>
+                <select id="sortSelect" class="form-select">
+                  <option value="name">Nome</option>
+                  <option value="priceAsc">Menor valor</option>
+                  <option value="priceDesc">Maior valor</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0">Produtos disponíveis</h2>
+            <span id="availableCount" class="text-muted small"></span>
+          </div>
+          <div id="productsGrid" class="row g-4"></div>
+          <div id="emptyProducts" class="alert alert-light border d-none mt-3 mb-0">
+            Nenhum produto encontrado.
+          </div>
+        </section>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="sticky-summary">
+          <section class="card section-card border-0 mb-4">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Carrinho</h2>
+                <span id="cartBadge" class="badge text-bg-dark">0</span>
+              </div>
+
+              <div id="cartItems">
+                <p class="text-muted mb-0">Seu carrinho está vazio.</p>
+              </div>
+
+              <div class="d-flex justify-content-between fw-semibold border-top pt-3 mt-3">
+                <span>Total</span>
+                <span id="cartTotal">R$ 0,00</span>
+              </div>
+
+              <div class="d-grid gap-2 mt-3">
+                <button id="checkoutBtn" class="btn btn-dark">Confirmar seleção</button>
+                <button id="clearCartBtn" class="btn btn-outline-secondary">Limpar carrinho</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card section-card border-0">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Meus presentes</h2>
+                <span id="myItemsBadge" class="badge text-bg-secondary">0</span>
+              </div>
+              <div id="myItems">
+                <p class="text-muted mb-0">Você ainda não reservou presentes.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
