@@ -3,21 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chá de Panela | Leandro & Gabriella</title>
-  <meta name="description" content="Lista de presentes do chá de panela de Leandro e Gabriella" />
+  <title>Chá de Panela | Gabriella & Leandro</title>
+  <meta name="description" content="Lista de presentes do chá de panela de Gabriella & Leandro" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 </head>
 <body>
   <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
     <div class="container py-2">
-      <a class="navbar-brand fw-bold" href="#">Leandro & Gabriella</a>
-      <div class="d-flex align-items-center gap-2">
+      <a class="navbar-brand fw-bold" href="#">Gabriella & Leandro</a>
+      <div class="d-flex align-items-center gap-3">
         <span id="guestGreeting" class="small text-muted"></span>
-        <button id="changeNameBtn" class="btn btn-outline-secondary btn-sm d-none">Trocar nome</button>
+        <button id="changeNameBtn" class="btn btn-outline-secondary btn-sm d-none">
+          Trocar nome
+        </button>
+        <button id="cartHeaderBtn" class="btn btn-outline-dark position-relative d-none">
+          🧺
+          <span id="cartHeaderBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -27,16 +36,16 @@
       <div class="row g-4 align-items-stretch">
         <div class="col-xl-5 order-1 order-xl-2 mobile-first-image">
           <div class="hero-card hero-image-card h-100">
-            <div class="invite-frame">
-              <img src="./convite-cha-panela.png" alt="Convite do chá de panela de Leandro e Gabriella" class="invite-image">
-            </div>
+            <img src="./convite-cha-panela.png"
+                 alt="Convite do chá de panela de Gabriella e Leandro"
+                 class="invite-image-full">
           </div>
         </div>
 
         <div class="col-xl-7 order-2 order-xl-1 mobile-second-text">
           <div class="hero-card hero-text-card h-100">
             <p class="text-uppercase text-secondary fw-semibold small mb-2">Chá de Panela</p>
-            <h1 class="welcome-title fw-bold mb-3">Bem-vindo ao chá de panela de Leandro & Gabriella</h1>
+            <h1 class="welcome-title fw-bold mb-3">Bem-vindo ao chá de panela de Gabriella & Leandro</h1>
             <p class="welcome-lead mb-3">
               Escolha seu presente com carinho e reserve no seu nome.
             </p>
@@ -52,7 +61,7 @@
                   <button id="enterBtn" class="btn btn-dark btn-lg">Ver presentes disponíveis</button>
                 </div>
                 <div class="small text-muted mt-3">
-                  Não é necessário login com Google nem e-mail. Basta informar seu nome.
+                  Não é necessário login com e-mail. Basta informar seu nome.
                 </div>
               </div>
             </div>
@@ -82,10 +91,7 @@
                 <div class="col-md-3">
                   <label class="form-label fw-semibold">Ordenar por</label>
                   <select id="sortSelect" class="form-select">
-                    <option value="id">ID</option>
                     <option value="name">Nome</option>
-                    <option value="dateAsc">Data mais antiga</option>
-                    <option value="dateDesc">Data mais recente</option>
                   </select>
                 </div>
               </div>
@@ -105,7 +111,7 @@
         </div>
 
         <div class="col-lg-4">
-          <div class="sticky-summary">
+          <div id="cartSection" class="sticky-summary">
             <section class="card section-card border-0 mb-4">
               <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -141,6 +147,15 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./config.js"></script>
   <script src="./app.js"></script>
+  <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toastContainer"></div>
+  <div id="loadingOverlay" class="loading-overlay d-none">
+    <div class="loading-box">
+      <div class="spinner-border text-dark" role="status"></div>
+      <div class="mt-3 small text-muted">Processando...</div>
+    </div>
+  </div>
 </body>
 </html>

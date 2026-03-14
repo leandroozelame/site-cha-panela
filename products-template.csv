@@ -1,0 +1,6 @@
+﻿id,name,category,description,image_url,link_url,created_at,total_quantity,active
+1,Jogo de Taças,Cozinha,Conjunto com 6 taças de vidro.,https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=1200&auto=format&fit=crop,,10/03/2026 09:00:00,1,TRUE
+2,Conjunto de Panelas,Cozinha,Kit antiaderente para o dia a dia.,https://images.unsplash.com/photo-1584990347449-a4d05d7f182d?q=80&w=1200&auto=format&fit=crop,,10/03/2026 09:15:00,1,TRUE
+3,Faqueiro,Cozinha,Conjunto de talheres com 24 peças.,https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=80&w=1200&auto=format&fit=crop,,10/03/2026 09:30:00,1,TRUE
+4,Aparelho de Jantar,Mesa Posta,Jogo com pratos e bowls para 4 pessoas.,https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=1200&auto=format&fit=crop,,10/03/2026 09:45:00,2,TRUE
+5,Jogo de Cama,Quarto,Jogo queen com 4 peças.,https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop,,10/03/2026 10:00:00,1,TRUE

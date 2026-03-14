@@ -29,23 +29,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
-.invite-frame {
+.invite-image-full {
   width: 100%;
-  max-width: 430px;
-  margin: 0 auto;
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 10px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
-}
-
-.invite-image {
-  width: 100%;
+  max-width: 420px;
   height: auto;
   display: block;
   border-radius: 18px;
+  object-fit: contain;
 }
 
 .intro-form-card {
@@ -139,10 +132,18 @@ body {
   font-size: 0.78rem;
 }
 
-@media (max-width: 1199px) {
-  .invite-frame {
-    max-width: 560px;
-  }
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.8);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-box {
+  text-align: center;
 }
 
 @media (max-width: 991px) {
@@ -160,6 +161,8 @@ body {
 
   .mobile-first-image {
     order: 1 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   .mobile-second-text {
@@ -167,19 +170,22 @@ body {
   }
 
   .hero-image-card {
-    padding: 12px;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: hidden;
   }
 
-  .invite-frame {
+  .invite-image-full {
+    width: 100%;
     max-width: 100%;
-    padding: 8px;
-    border-radius: 20px;
-  }
-
-  .invite-image {
-    max-height: 62vh;
+    height: auto;
+    max-height: 65vh;
+    display: block;
+    margin: 0 auto;
+    border-radius: 0;
     object-fit: contain;
-    border-radius: 14px;
   }
 
   .hero-text-card {
