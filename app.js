@@ -664,10 +664,7 @@ document.addEventListener("DOMContentLoaded", function () {
   renderAll();
 
   if (state.isEntered) {
-    showAlert(
-      'Você entrou como <strong>' + state.guestName + '</strong>. Para zerar todos os dados locais, use <code>resetAllData()</code> no console.',
-      "info"
-    );
+    showAlert('Você entrou como <strong>' + state.guestName + '</strong>. Para zerar todos os dados locais, use <code>resetAllData()</code> no console.', "info");
   }
 });
 

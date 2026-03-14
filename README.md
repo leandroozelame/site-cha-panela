@@ -1,19 +1,13 @@
 # Chá de Panela - Leandro & Gabriella
 
-Versão atualizada para usar a imagem do convite na tela de boas-vindas.
+Versão v4 com ajuste da tela inicial para mobile.
 
-## O que foi ajustado
-- a imagem enviada foi incorporada na tela inicial
-- layout em duas colunas no desktop:
-  - texto + entrada do nome
-  - convite em destaque
-- no mobile a imagem fica bem encaixada em cima/baixo com moldura suave
-- sem preço
-- com data no formato `dd/mm/yyyy hh:mm:ss`
-- itens com ID sequencial
-- entrada apenas com nome
-- lista com imagem, categoria, nome, quantidade disponível e link externo
-- nome íntimo para seleção: `Minha lista de carinho`
+## O que mudou
+- no celular, o convite agora aparece primeiro
+- o texto inicial foi encurtado para caber melhor na primeira visualização
+- o formulário de nome vem logo abaixo da imagem
+- mantido o layout em duas colunas no desktop
+- corrigido o erro de JavaScript do botão `saveNameBtn` inexistente
 
 ## Como rodar
 Na pasta do projeto:

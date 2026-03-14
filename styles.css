@@ -37,7 +37,7 @@ body {
   margin: 0 auto;
   background: #ffffff;
   border-radius: 24px;
-  padding: 12px;
+  padding: 10px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
 }
 
@@ -50,6 +50,18 @@ body {
 
 .intro-form-card {
   margin-top: auto;
+}
+
+.welcome-title {
+  font-size: clamp(2rem, 4vw, 3.3rem);
+}
+
+.welcome-lead {
+  font-size: 1.08rem;
+}
+
+.welcome-subtext {
+  font-size: 0.98rem;
 }
 
 .section-card {
@@ -139,7 +151,55 @@ body {
   }
 
   .hero-card {
-    padding: 22px;
+    padding: 18px;
+  }
+
+  .welcome-wrap .row {
+    row-gap: 1rem;
+  }
+
+  .mobile-first-image {
+    order: 1 !important;
+  }
+
+  .mobile-second-text {
+    order: 2 !important;
+  }
+
+  .hero-image-card {
+    padding: 12px;
+  }
+
+  .invite-frame {
+    max-width: 100%;
+    padding: 8px;
+    border-radius: 20px;
+  }
+
+  .invite-image {
+    max-height: 62vh;
+    object-fit: contain;
+    border-radius: 14px;
+  }
+
+  .hero-text-card {
+    padding-top: 6px;
+  }
+
+  .welcome-title {
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+
+  .welcome-lead {
+    font-size: 0.98rem;
+    margin-bottom: 0.55rem !important;
+  }
+
+  .welcome-subtext {
+    font-size: 0.92rem;
+    margin-bottom: 1rem !important;
   }
 
   .product-image {
@@ -150,9 +210,5 @@ body {
   .btn,
   button {
     touch-action: manipulation;
-  }
-
-  .invite-frame {
-    max-width: 100%;
   }
 }
