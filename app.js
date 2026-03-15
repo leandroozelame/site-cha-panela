@@ -15,19 +15,25 @@ function renderReservationSummary() {
   if (!container) return;
 
   if (!state.myReservations.length) {
-    container.innerHTML = "<p>Nenhum presente reservado.</p>";
+    container.innerHTML = `
+      <div class="text-center text-muted py-3">
+        Nenhum presente reservado.
+      </div>
+    `;
     return;
   }
 
   container.innerHTML = state.myReservations.map(item => `
-    <div class="line-item border rounded-4 p-3 mb-3">
-      <div class="d-flex gap-3 align-items-center">
-        <img class="small-photo" src="${item.image_url}" alt="${item.product_name}">
-        <div class="text-start">
-          <div class="fw-semibold">${item.product_name}</div>
-          <div class="small text-muted">${item.category}</div>
-          <div class="small text-muted">Quantidade: ${item.quantity}</div>
-        </div>
+    <div class="summary-item-card">
+      <img
+        class="summary-item-photo"
+        src="${item.image_url}"
+        alt="${item.product_name}"
+      >
+      <div class="summary-item-content">
+        <div class="summary-item-name">${item.product_name}</div>
+        <div class="summary-item-meta">${item.category}</div>
+        <div class="summary-item-meta">Quantidade: ${item.quantity}</div>
       </div>
     </div>
   `).join("");
@@ -339,14 +345,46 @@ function renderProducts() {
 
 function renderDraftReserved() {
   const container = byId("reservedItems");
-  byId("reservedBadge").textContent = String(state.draftReserved.reduce((sum, item) => sum + Number(item.quantity || 0), 0));
+  const badge = byId("reservedBadge");
 
-  if (!state.draftReserved.length) {
+  if (!container || !badge) return;
+
+  const hasDraft = state.draftReserved.length > 0;
+  const hasConfirmed = state.myReservations.length > 0;
+
+  const items = hasDraft
+    ? state.draftReserved.map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        quantity: item.quantity,
+        image_url: item.image_url,
+        created_at: item.created_at,
+        mode: "draft"
+      }))
+    : hasConfirmed
+      ? state.myReservations.map(item => ({
+          id: item.reservation_id,
+          productId: item.product_id,
+          name: item.product_name,
+          category: item.category,
+          quantity: item.quantity,
+          image_url: item.image_url,
+          created_at: item.created_at,
+          mode: "confirmed"
+        }))
+      : [];
+
+  badge.textContent = String(
+    items.reduce((sum, item) => sum + Number(item.quantity || 0), 0)
+  );
+
+  if (!items.length) {
     container.innerHTML = '<p class="text-muted mb-0">Você ainda não reservou presentes.</p>';
     return;
   }
 
-  container.innerHTML = state.draftReserved.map(item => `
+  container.innerHTML = items.map(item => `
     <div class="line-item border rounded-4 p-3">
       <div class="d-flex gap-3">
         <img class="small-photo" src="${item.image_url}" alt="${item.name}">
@@ -356,11 +394,25 @@ function renderDraftReserved() {
           <div class="small text-muted">${formatDateBR(item.created_at)}</div>
           <div class="d-flex justify-content-between align-items-center mt-3 gap-2 flex-wrap">
             <div class="qty-pill">
-              <button type="button" class="draft-qty-btn" data-action="minus" data-product-id="${item.id}">-</button>
-              <span>${item.quantity}</span>
-              <button type="button" class="draft-qty-btn" data-action="plus" data-product-id="${item.id}">+</button>
+              ${
+                item.mode === "draft"
+                  ? `
+                    <button type="button" class="draft-qty-btn" data-action="minus" data-product-id="${item.id}">-</button>
+                    <span>${item.quantity}</span>
+                    <button type="button" class="draft-qty-btn" data-action="plus" data-product-id="${item.id}">+</button>
+                  `
+                  : `
+                    <button type="button" class="my-qty-btn" data-action="minus" data-reservation-id="${item.id}">-</button>
+                    <span>${item.quantity}</span>
+                    <button type="button" class="my-qty-btn" data-action="plus" data-reservation-id="${item.id}">+</button>
+                  `
+              }
             </div>
-            <button type="button" class="btn btn-sm btn-outline-danger remove-draft-btn" data-product-id="${item.id}">Remover</button>
+            ${
+              item.mode === "draft"
+                ? `<button type="button" class="btn btn-sm btn-outline-danger remove-draft-btn" data-product-id="${item.id}">Remover</button>`
+                : `<button type="button" class="btn btn-sm btn-outline-danger remove-my-btn" data-reservation-id="${item.id}">Excluir</button>`
+            }
           </div>
         </div>
       </div>
@@ -404,7 +456,6 @@ function renderAll() {
   renderSections();
   renderProducts();
   renderDraftReserved();
-  renderMyReservations();
   updateHeaderCart();
   renderReservationSummary();
 }
@@ -663,6 +714,41 @@ async function removeMyReservation(reservationId) {
   }
 }
 
+async function cancelAllReservationsAndRestart() {
+  clearAlert();
+
+  try {
+    showLoading("Cancelando reservas...");
+
+    for (const item of state.myReservations) {
+      await apiPost({
+        action: "deleteReservation",
+        reservationId: Number(item.reservation_id),
+        guestName: state.guestName
+      });
+    }
+
+    state.draftReserved = [];
+    state.myReservations = [];
+    state.showReservationSummary = false;
+
+    persistUi();
+
+    await loadProducts();
+    await loadMyReservations();
+
+    updateCategories();
+    renderAll();
+
+    hideLoading();
+
+    showAlert("Reserva cancelada. Você pode escolher novamente do zero.", "secondary");
+  } catch (error) {
+    hideLoading();
+    showAlert(error.message, "danger");
+  }
+}
+
 function attachEventDelegation() {
   document.addEventListener("click", function (event) {
     const addBtn = event.target.closest(".add-gift-btn");
@@ -737,10 +823,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (clearReservedBtn) clearReservedBtn.addEventListener("click", clearDraftList);
 
   if (restartBtn) {
-    restartBtn.addEventListener("click", () => {
-      state.showReservationSummary = false;
-      renderAll();
-    });
+    restartBtn.addEventListener("click", cancelAllReservationsAndRestart);
   }
 
   attachEventDelegation();
@@ -748,16 +831,29 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   if (state.guestName) {
     state.isEntered = true;
+
     try {
-      showLoading("Carregando presentes...");
-      await loadProducts();
+      showLoading("Carregando suas reservas...");
+
       await loadMyReservations();
 
       state.showReservationSummary = state.myReservations.length > 0;
 
-      hideLoading();
+      renderAll();
+
+      if (state.showReservationSummary) {
+        showLoading("Carregando seus presentes reservados...");
+      } else {
+        showLoading("Carregando presentes...");
+      }
+
+      await loadProducts();
+
       updateCategories();
       renderAll();
+
+      hideLoading();
+
       showAlert('Você entrou como <strong>' + state.guestName + '</strong>.', "info");
     } catch (error) {
       hideLoading();
