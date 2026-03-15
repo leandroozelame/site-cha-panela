@@ -464,3 +464,36 @@ body {
   display: inline-block;
   line-height: 1;
 }
+
+.btn-whatsapp-share {
+  background: #25D366;
+  border: none;
+  color: white;
+  font-weight: 600;
+
+  border-radius: 0;            /* borda quadrada */
+
+  padding: 0.25rem 0.5rem;     /* igual btn-sm */
+  font-size: 0.875rem;         /* igual btn-sm */
+  line-height: 1.5;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  width: auto;
+  transition: background 0.2s ease;
+}
+
+.btn-whatsapp-share:hover {
+  background: #1ebe5d;
+}
+
+.btn-whatsapp-share:active {
+  background: #18a94f;
+}
+
+.wa-svg {
+  flex-shrink: 0;
+}

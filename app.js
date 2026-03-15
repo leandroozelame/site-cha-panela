@@ -10,6 +10,29 @@ const state = {
   showReservationSummary: false
 };
 
+function shareReservationToWhatsApp() {
+  if (!state.myReservations.length) {
+    showAlert("Nenhum presente reservado para compartilhar.", "warning");
+    return;
+  }
+
+  const itens = state.myReservations.map(item =>
+`Descrição: ${item.product_name}
+Categoria: ${item.category}
+Quantidade: ${item.quantity}`
+  ).join("\n\n");
+
+  const nome = state.guestName || "Convidado";
+
+  const mensagem = `Olá! Aqui é ${nome}.
+
+Reservei estes presentes no chá de panela da Gabriella & Leandro:
+
+${itens}`;
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, "_blank");
+}
+
 function renderReservationSummary() {
   const container = byId("summaryItems");
   if (!container) return;
@@ -811,6 +834,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const confirmBtn = byId("confirmBtn");
   const clearReservedBtn = byId("clearReservedBtn");
   const restartBtn = byId("restartReservationBtn");
+  const shareReservationBtn = byId("shareReservationBtn");
 
   if (guestNameInput) {
     guestNameInput.value = state.guestName || "";
@@ -826,9 +850,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (sortSelect) sortSelect.addEventListener("change", renderProducts);
   if (confirmBtn) confirmBtn.addEventListener("click", confirmReservation);
   if (clearReservedBtn) clearReservedBtn.addEventListener("click", clearDraftList);
-
   if (restartBtn) {
     restartBtn.addEventListener("click", cancelAllReservationsAndRestart);
+  }
+  if (shareReservationBtn) {
+    shareReservationBtn.addEventListener("click", shareReservationToWhatsApp);
   }
 
   attachEventDelegation();

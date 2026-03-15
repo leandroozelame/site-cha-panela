@@ -24,7 +24,7 @@
     <div class="d-flex align-items-center gap-3">
       <span id="guestGreeting" class="small text-muted"></span>
       <button id="changeNameBtn" class="btn btn-outline-secondary btn-sm d-none">
-        Trocar nome
+        Sair
       </button>
       <button id="cartHeaderBtn" class="btn btn-outline-dark position-relative d-none">
         🧺
@@ -47,15 +47,13 @@
 
       <div class="col-xl-7 order-2 order-xl-1 mobile-second-text">
         <div class="hero-card hero-text-card h-100">
-          <p class="text-uppercase text-secondary fw-semibold small mb-2">Chá de Panela</p>
-          <h1 class="welcome-title fw-bold mb-3">Bem-vindo ao chá de panela de Gabriella & Leandro</h1>
           <p class="welcome-lead mb-3">
             Escolha seu presente com carinho e reserve no seu nome.
           </p>
           <div class="card section-card border-0 intro-form-card">
             <div class="card-body p-4">
               <label for="guestNameInput" class="form-label fw-semibold">Seu nome</label>
-              <input id="guestNameInput" type="text" class="form-control mb-3" placeholder="Ex.: Maria Souza">
+              <input id="guestNameInput" type="text" class="form-control mb-3" placeholder="Ex.: Maria">
               <div class="d-grid gap-2">
                 <button id="enterBtn" class="btn btn-dark btn-sm">Ver presentes disponíveis</button>
               </div>
@@ -74,37 +72,45 @@
 
     <div id="reservationSummary" class="d-none reservation-success-screen">
       <div class="reservation-success-inner">
+        <div id="reservationShareCard" class="reservation-share-card">
+          <section class="card section-card border-0 reservation-success-card">
+            <div class="card-body p-4 p-md-5 text-center">
+              <div class="success-kicker">Chá de Panela</div>
 
-        <section class="card section-card border-0 reservation-success-card">
-          <div class="card-body p-4 p-md-5 text-center">
-            <div class="success-kicker">Chá de Panela</div>
+              <h2 class="reservation-success-title mb-2">
+                Presente reservado com sucesso
+              </h2>
 
-            <h2 class="reservation-success-title mb-2">
-              Presente reservado com sucesso
-            </h2>
+              <p class="reservation-success-subtitle mb-4">
+                Muito obrigado pelo carinho! Caso queira refazer sua escolha, você pode cancelar a reserva e começar novamente.
+              </p>
 
-            <p class="reservation-success-subtitle mb-4">
-              Muito obrigado pelo carinho! Caso queira refazer sua escolha, você pode cancelar a reserva e começar novamente.
-            </p>
+              <div id="summaryItems" class="mt-3 text-start"></div>
 
-            <div id="summaryItems" class="mt-3 text-start"></div>
+              <div class="d-grid gap-2 mt-4">
+                <button id="shareReservationBtn" class="btn-whatsapp-share">
+                  Compartilhar no WhatsApp
+                  <svg width="14" height="14" viewBox="0 0 15 15" fill="currentColor" class="wa-svg" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.49874 1.5C9.25874 1.5 10.9187 2.27 12.0587 3.61C13.2187 4.97 13.6987 6.7 13.4187 8.5C13.0187 11.04 10.9487 13.07 8.38874 13.44C8.08874 13.48 7.78874 13.51 7.49874 13.51C6.36874 13.51 5.26874 13.19 4.30874 12.58L3.70874 12.2L3.03874 12.42L2.52874 12.59L2.94874 11.47L2.51874 10.83C1.71874 9.63 1.37874 8.24 1.54874 6.79C1.85874 4.04 4.17874 1.78 6.93874 1.53C7.12874 1.51 7.31874 1.5 7.50874 1.5M7.49874 0C7.26874 0 7.02874 0.00999997 6.78874 0.03C3.30874 0.35 0.43874 3.14 0.0487397 6.62C-0.16126 8.5 0.31874 10.25 1.26874 11.67L0.0387397 15L3.50874 13.84C4.66874 14.57 6.02874 15 7.49874 15C7.85874 15 8.22874 14.97 8.60874 14.92C11.7987 14.46 14.3987 11.91 14.8987 8.73C15.6387 4.05 12.0387 0 7.49874 0Z" fill="white"></path>
+                    <path d="M11.0187 9.07C10.9687 9 10.8587 8.96 10.6887 8.87C10.5187 8.79 9.64874 8.36 9.49874 8.31C9.33874 8.25 9.21874 8.22 9.10874 8.39C8.98874 8.56 8.65874 8.96 8.55874 9.07C8.45874 9.19 8.35874 9.2 8.18874 9.12C8.00874 9.03 7.44874 8.85 6.78874 8.26C6.26874 7.8 5.91874 7.24 5.81874 7.06C5.71874 6.89 5.80874 6.8 5.89874 6.71C5.97874 6.63 6.06874 6.51 6.15874 6.41C6.24874 6.31 6.26874 6.24 6.32874 6.12C6.38874 6 6.35874 5.91 6.31874 5.82C6.26874 5.73 5.92874 4.88 5.77874 4.53C5.63874 4.18 5.48874 4.24 5.38874 4.24C5.28874 4.24 5.16874 4.22 5.05874 4.22C4.93874 4.22 4.74874 4.27 4.59874 4.44C4.43874 4.61 3.98874 5.03 3.98874 5.88C3.98874 6.73 4.61874 7.55 4.69874 7.67C4.77874 7.79 5.89874 9.59 7.67874 10.28C9.44874 10.97 9.44874 10.74 9.76874 10.71C10.0887 10.68 10.7987 10.29 10.9487 9.89C11.0887 9.48 11.0887 9.13 11.0487 9.06L11.0187 9.07Z" fill="white"></path>
+                  </svg>
+                </button>
 
-            <div class="d-grid mt-4">
-              <button id="restartReservationBtn" class="btn btn-outline-danger btn-sm">
-                Cancelar reserva e recomeçar
-              </button>
+                <button id="restartReservationBtn" class="btn btn-outline-danger btn-sm">
+                  Cancelar reserva e recomeçar
+                </button>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <section class="reservation-invite-section">
-          <img
-                  src="./convite-cha-panela-reservado.png"
-                  alt="Convite com data, horário e local do chá de panela"
-                  class="reservation-invite-image"
-          >
-        </section>
-
+          <section class="reservation-invite-section">
+            <img
+                    src="./convite-cha-panela-reservado.png"
+                    alt="Convite com data, horário e local do chá de panela"
+                    class="reservation-invite-image"
+            >
+          </section>
+        </div>
       </div>
     </div>
 
@@ -169,6 +175,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="./config.js"></script>
 <script src="./app.js"></script>
+
 <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toastContainer"></div>
 <div id="loadingOverlay" class="loading-overlay d-none">
   <div class="loading-box">
