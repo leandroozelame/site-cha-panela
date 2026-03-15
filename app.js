@@ -6,8 +6,71 @@ const state = {
   products: [],
   draftReserved: loadJson("cha_draft_reserved", []),
   myReservations: [],
-  isEntered: false
+  isEntered: false,
+  showReservationSummary: false
 };
+
+function renderReservationSummary() {
+
+  const container = byId("summaryItems");
+
+  if (!state.myReservations.length) {
+    container.innerHTML = "<p>Nenhum presente reservado.</p>";
+    return;
+  }
+
+  container.innerHTML = state.myReservations.map(item => `
+    <div class="line-item border rounded-4 p-3 mb-3">
+      <div class="d-flex gap-3 align-items-center">
+        <img class="small-photo" src="${item.image_url}">
+        <div class="text-start">
+          <div class="fw-semibold">${item.product_name}</div>
+          <div class="small text-muted">${item.category}</div>
+          <div class="small text-muted">
+            Quantidade: ${item.quantity}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+}
+
+function nomeLojaPorUrl(url) {
+  if (!url) return "Ver referência externa";
+
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+
+    if (host.includes("amazon")) return "Amazon";
+    if (host.includes("mercadolivre") || host.includes("mercadolibre")) return "Mercado Livre";
+    if (host.includes("magazineluiza") || host.includes("magalu")) return "Magazine Luiza";
+    if (host.includes("casasbahia")) return "Casas Bahia";
+    if (host.includes("pontofrio") || host.includes("ponto")) return "Ponto";
+    if (host.includes("shopee")) return "Shopee";
+    if (host.includes("americanas")) return "Americanas";
+    if (host.includes("submarino")) return "Submarino";
+    if (host.includes("extra")) return "Extra";
+
+    // fallback: mostra o domínio
+    return host.replace("www.", "");
+  } catch (e) {
+    return "Ver referência externa";
+  }
+}
+
+function formatDateBR(dateValue) {
+  const d = new Date(dateValue)
+
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+
+  const hours = String(d.getHours()).padStart(2, '0')
+  const minutes = String(d.getMinutes()).padStart(2, '0')
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`
+}
 
 function showLoading(text = "Processando...") {
   const overlay = byId("loadingOverlay");
@@ -209,8 +272,23 @@ function updateHeaderCart() {
 }
 
 function renderSections() {
+
   byId("welcomeSection").classList.toggle("d-none", state.isEntered);
-  byId("giftsSection").classList.toggle("d-none", !state.isEntered);
+
+  const giftsSection = byId("giftsSection");
+  giftsSection.classList.toggle("d-none", !state.isEntered);
+
+  const productsArea = byId("productsArea");
+  const summaryArea = byId("reservationSummary");
+
+  if (state.showReservationSummary) {
+    productsArea.classList.add("d-none");
+    summaryArea.classList.remove("d-none");
+  } else {
+    productsArea.classList.remove("d-none");
+    summaryArea.classList.add("d-none");
+  }
+
 }
 
 function renderProducts() {
@@ -235,20 +313,24 @@ function renderProducts() {
         <div class="card-body d-flex flex-column p-4">
           <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
             <h3 class="h5 mb-0">${product.name}</h3>
-            <span class="badge text-bg-light id-badge">ID ${product.id}</span>
           </div>
 
           <div class="product-meta text-muted mb-1"><strong>Categoria:</strong> ${product.category}</div>
-          <div class="product-meta text-muted mb-1"><strong>Data:</strong> ${product.created_at}</div>
           <div class="product-meta text-muted mb-2"><strong>Disponível:</strong> ${product.available_quantity}</div>
           ${product.description ? `<p class="text-muted small mb-2">${product.description}</p>` : ""}
           <div class="small mb-3">
-            ${product.link_url ? `<a href="${product.link_url}" target="_blank" rel="noopener noreferrer">Ver referência externa</a>` : '<span class="text-muted">Sem link externo</span>'}
+            ${
+              product.link_url
+                ? `<a href="${product.link_url}" target="_blank" rel="noopener noreferrer">
+                     Ver na ${nomeLojaPorUrl(product.link_url)}
+                   </a>`
+                : '<span class="text-muted">Sem link externo</span>'
+            }
           </div>
 
           <div class="mt-auto d-grid">
             <button class="btn btn-dark touch-btn add-gift-btn" data-product-id="${product.id}" type="button">
-              Adicionar à minha lista de carinho
+              Adicionar à minha lista de presente
             </button>
           </div>
         </div>
@@ -272,8 +354,8 @@ function renderDraftReserved() {
         <img class="small-photo" src="${item.image_url}" alt="${item.name}">
         <div class="flex-grow-1">
           <div class="fw-semibold">${item.name}</div>
-          <div class="small text-muted">ID ${item.id} • ${item.category}</div>
-          <div class="small text-muted">${item.created_at}</div>
+          <div class="small text-muted">${item.category}</div>
+          <div class="small text-muted">${formatDateBR(item.created_at)}</div>
           <div class="d-flex justify-content-between align-items-center mt-3 gap-2 flex-wrap">
             <div class="qty-pill">
               <button type="button" class="draft-qty-btn" data-action="minus" data-product-id="${item.id}">-</button>
@@ -303,8 +385,8 @@ function renderMyReservations() {
         <img class="small-photo" src="${item.image_url}" alt="${item.product_name}">
         <div class="flex-grow-1">
           <div class="fw-semibold">${item.product_name}</div>
-          <div class="small text-muted">ID ${item.product_id} • ${item.category}</div>
-          <div class="small text-muted">${item.created_at}</div>
+          <div class="small text-muted">${item.category}</div>
+          <div class="small text-muted">${formatDateBR(item.created_at)}</div>
           <div class="d-flex justify-content-between align-items-center mt-3 gap-2 flex-wrap">
             <div class="qty-pill">
               <button type="button" class="my-qty-btn" data-action="minus" data-reservation-id="${item.reservation_id}">-</button>
@@ -326,6 +408,7 @@ function renderAll() {
   renderDraftReserved();
   renderMyReservations();
   updateHeaderCart();
+  renderReservationSummary();
 }
 
 async function enterWithName() {
@@ -412,7 +495,7 @@ function addGift(productId) {
   persistUi();
   renderDraftReserved();
   updateHeaderCart();
-  showAlert("Presente adicionado à sua lista de carinho.", "success");
+  showAlert("Presente adicionado à sua lista de presente.", "success");
 }
 
 function changeDraftQuantity(productId, delta) {
@@ -433,19 +516,22 @@ function changeDraftQuantity(productId, delta) {
 
   persistUi();
   renderDraftReserved();
+  updateHeaderCart();
 }
 
 function removeDraftItem(productId) {
   state.draftReserved = state.draftReserved.filter(entry => Number(entry.id) !== Number(productId));
   persistUi();
   renderDraftReserved();
+  updateHeaderCart();
 }
 
 function clearDraftList() {
   state.draftReserved = [];
   persistUi();
   renderDraftReserved();
-  showAlert("Sua lista de carinho foi limpa.", "secondary");
+  updateHeaderCart();
+  showAlert("Sua lista de presente foi limpa.", "secondary");
 }
 
 async function confirmReservation() {
@@ -458,7 +544,7 @@ async function confirmReservation() {
   }
 
   if (!state.draftReserved.length) {
-    showAlert("Sua lista de carinho está vazia.", "warning");
+    showAlert("Sua lista de presente está vazia.", "warning");
     return;
   }
 
@@ -477,17 +563,14 @@ async function confirmReservation() {
 
     state.draftReserved = [];
     persistUi();
-
     await loadProducts();
     await loadMyReservations();
-
     updateCategories();
     renderAll();
-
     hideLoading();
-
     showAlert("Reserva confirmada com sucesso. Muito obrigado pelo carinho!", "success");
-
+    state.showReservationSummary = true;
+    renderAll();
   } catch (error) {
 
     hideLoading();
@@ -677,7 +760,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       hideLoading();
       updateCategories();
       renderAll();
-      showAlert('Você entrou como <strong>' + state.guestName + '</strong>. Para limpar apenas os dados locais do navegador, use <code>resetLocalDraft()</code> no console.', "info");
+      showAlert('Você entrou como <strong>' + state.guestName + '</strong>.', "info");
     } catch (error) {
       showAlert(error.message, "danger");
     }
@@ -692,6 +775,15 @@ document.addEventListener("DOMContentLoaded", async function () {
           block: "start"
         });
       }
+    });
+  }
+
+  const restartBtn = byId("restartReservationBtn");
+
+  if (restartBtn) {
+    restartBtn.addEventListener("click", () => {
+      state.showReservationSummary = false;
+      renderAll();
     });
   }
 });
