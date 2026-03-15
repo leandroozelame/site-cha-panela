@@ -15,81 +15,80 @@
   <meta http-equiv="Expires" content="0">
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
-    <div class="container py-2">
-      <a class="navbar-brand fw-bold" href="#">Gabriella & Leandro</a>
-      <div class="d-flex align-items-center gap-3">
-        <span id="guestGreeting" class="small text-muted"></span>
-        <button id="changeNameBtn" class="btn btn-outline-secondary btn-sm d-none">
-          Trocar nome
-        </button>
-        <button id="cartHeaderBtn" class="btn btn-outline-dark position-relative d-none">
-          🧺
-          <span id="cartHeaderBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-        </button>
-      </div>
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
+  <div class="container py-2">
+    <a class="navbar-brand fw-bold" href="#">Gabriella & Leandro</a>
+    <div class="d-flex align-items-center gap-3">
+      <span id="guestGreeting" class="small text-muted"></span>
+      <button id="changeNameBtn" class="btn btn-outline-secondary btn-sm d-none">
+        Trocar nome
+      </button>
+      <button id="cartHeaderBtn" class="btn btn-outline-dark position-relative d-none">
+        🧺
+        <span id="cartHeaderBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+      </button>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <main class="container py-4 py-md-5">
-    <section id="welcomeSection" class="welcome-wrap">
-      <div class="row g-4 align-items-stretch">
-        <div class="col-xl-5 order-1 order-xl-2 mobile-first-image">
-          <div class="hero-card hero-image-card h-100">
-            <img src="./convite-cha-panela.png"
-                 alt="Convite do chá de panela de Gabriella e Leandro"
-                 class="invite-image-full">
-          </div>
+<main class="container py-4 py-md-5">
+  <section id="welcomeSection" class="welcome-wrap">
+    <div class="row g-4 align-items-stretch">
+      <div class="col-xl-5 order-1 order-xl-2 mobile-first-image">
+        <div class="hero-card hero-image-card h-100">
+          <img src="./convite-cha-panela.png"
+               alt="Convite do chá de panela de Gabriella e Leandro"
+               class="invite-image-full">
         </div>
+      </div>
 
-        <div class="col-xl-7 order-2 order-xl-1 mobile-second-text">
-          <div class="hero-card hero-text-card h-100">
-            <p class="text-uppercase text-secondary fw-semibold small mb-2">Chá de Panela</p>
-            <h1 class="welcome-title fw-bold mb-3">Bem-vindo ao chá de panela de Gabriella & Leandro</h1>
-            <p class="welcome-lead mb-3">
-              Escolha seu presente com carinho e reserve no seu nome.
-            </p>
-            <p class="welcome-subtext mb-4 text-secondary">
-              Veja o convite acima e, quando estiver pronto, informe seu nome para abrir a lista de presentes disponíveis.
-            </p>
+      <div class="col-xl-7 order-2 order-xl-1 mobile-second-text">
+        <div class="hero-card hero-text-card h-100">
+          <p class="text-uppercase text-secondary fw-semibold small mb-2">Chá de Panela</p>
+          <h1 class="welcome-title fw-bold mb-3">Bem-vindo ao chá de panela de Gabriella & Leandro</h1>
+          <p class="welcome-lead mb-3">
+            Escolha seu presente com carinho e reserve no seu nome.
+          </p>
+          <p class="welcome-subtext mb-4 text-secondary">
+            Veja o convite acima e, quando estiver pronto, informe seu nome para abrir a lista de presentes disponíveis.
+          </p>
 
-            <div class="card section-card border-0 intro-form-card">
-              <div class="card-body p-4">
-                <label for="guestNameInput" class="form-label fw-semibold">Seu nome</label>
-                <input id="guestNameInput" type="text" class="form-control mb-3" placeholder="Ex.: Maria Souza">
-                <div class="d-grid gap-2">
-                  <button id="enterBtn" class="btn btn-dark btn-lg">Ver presentes disponíveis</button>
-                </div>
-                <div class="small text-muted mt-3">
-                  Não é necessário login com e-mail. Basta informar seu nome.
-                </div>
+          <div class="card section-card border-0 intro-form-card">
+            <div class="card-body p-4">
+              <label for="guestNameInput" class="form-label fw-semibold">Seu nome</label>
+              <input id="guestNameInput" type="text" class="form-control mb-3" placeholder="Ex.: Maria Souza">
+              <div class="d-grid gap-2">
+                <button id="enterBtn" class="btn btn-dark btn-lg">Ver presentes disponíveis</button>
+              </div>
+              <div class="small text-muted mt-3">
+                Não é necessário login com e-mail. Basta informar seu nome.
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="giftsSection" class="d-none">
-      <div id="alertBox" class="alert d-none mt-4" role="alert"></div>
+  <section id="giftsSection" class="d-none">
+    <div id="alertBox" class="alert d-none mt-4" role="alert"></div>
 
-      <div id="reservationSummary" class="d-none">
-
-        <div class="card section-card border-0 mb-4 text-center">
-          <div class="card-body p-4">
-            <h2 class="fw-bold mb-3">Presente reservado com sucesso</h2>
-            <p class="text-muted">
-              Muito obrigado pelo carinho!
-            </p>
-            <div id="summaryItems" class="mt-4"></div>
-            <button id="restartReservationBtn"
-                    class="btn btn-outline-dark mt-4">
-              Escolher outros presentes
-            </button>
-          </div>
+    <div id="reservationSummary" class="d-none">
+      <div class="card section-card border-0 mb-4 text-center">
+        <div class="card-body p-4">
+          <h2 class="fw-bold mb-3">Presente reservado com sucesso</h2>
+          <p class="text-muted">
+            Muito obrigado pelo carinho!
+          </p>
+          <div id="summaryItems" class="mt-4"></div>
+          <button id="restartReservationBtn" class="btn btn-outline-dark mt-4">
+            Escolher outros presentes
+          </button>
         </div>
       </div>
+    </div>
 
+    <div id="productsArea">
       <div class="row g-4 mt-1">
         <div class="col-lg-8">
           <section class="card section-card border-0 mb-4">
@@ -155,18 +154,19 @@
           </div>
         </div>
       </div>
-    </section>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="./config.js"></script>
-  <script src="./app.js"></script>
-  <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toastContainer"></div>
-  <div id="loadingOverlay" class="loading-overlay d-none">
-    <div class="loading-box">
-      <div class="spinner-border text-dark" role="status"></div>
-      <div class="mt-3 small text-muted">Processando...</div>
     </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./config.js"></script>
+<script src="./app.js"></script>
+<div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toastContainer"></div>
+<div id="loadingOverlay" class="loading-overlay d-none">
+  <div class="loading-box">
+    <div class="spinner-border text-dark" role="status"></div>
+    <div class="mt-3 small text-muted">Processando...</div>
   </div>
+</div>
 </body>
 </html>

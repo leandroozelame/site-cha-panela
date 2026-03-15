@@ -11,8 +11,8 @@ const state = {
 };
 
 function renderReservationSummary() {
-
   const container = byId("summaryItems");
+  if (!container) return;
 
   if (!state.myReservations.length) {
     container.innerHTML = "<p>Nenhum presente reservado.</p>";
@@ -22,18 +22,15 @@ function renderReservationSummary() {
   container.innerHTML = state.myReservations.map(item => `
     <div class="line-item border rounded-4 p-3 mb-3">
       <div class="d-flex gap-3 align-items-center">
-        <img class="small-photo" src="${item.image_url}">
+        <img class="small-photo" src="${item.image_url}" alt="${item.product_name}">
         <div class="text-start">
           <div class="fw-semibold">${item.product_name}</div>
           <div class="small text-muted">${item.category}</div>
-          <div class="small text-muted">
-            Quantidade: ${item.quantity}
-          </div>
+          <div class="small text-muted">Quantidade: ${item.quantity}</div>
         </div>
       </div>
     </div>
   `).join("");
-
 }
 
 function nomeLojaPorUrl(url) {
@@ -52,7 +49,6 @@ function nomeLojaPorUrl(url) {
     if (host.includes("submarino")) return "Submarino";
     if (host.includes("extra")) return "Extra";
 
-    // fallback: mostra o domínio
     return host.replace("www.", "");
   } catch (e) {
     return "Ver referência externa";
@@ -60,16 +56,16 @@ function nomeLojaPorUrl(url) {
 }
 
 function formatDateBR(dateValue) {
-  const d = new Date(dateValue)
+  const d = new Date(dateValue);
 
-  const day = String(d.getDate()).padStart(2, '0')
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const year = d.getFullYear()
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
 
-  const hours = String(d.getHours()).padStart(2, '0')
-  const minutes = String(d.getMinutes()).padStart(2, '0')
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
 
-  return `${day}/${month}/${year} ${hours}:${minutes}`
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
 function showLoading(text = "Processando...") {
@@ -109,7 +105,6 @@ function persistUi() {
 }
 
 function showAlert(message, type = "success") {
-
   const colors = {
     success: "text-bg-success",
     danger: "text-bg-danger",
@@ -252,7 +247,6 @@ function renderHeader() {
 }
 
 function updateHeaderCart() {
-
   const cartBtn = byId("cartHeaderBtn");
   const badge = byId("cartHeaderBadge");
 
@@ -268,18 +262,23 @@ function updateHeaderCart() {
   if (cartBtn) {
     cartBtn.classList.toggle("d-none", !state.isEntered);
   }
-
 }
 
 function renderSections() {
-
-  byId("welcomeSection").classList.toggle("d-none", state.isEntered);
-
+  const welcomeSection = byId("welcomeSection");
   const giftsSection = byId("giftsSection");
-  giftsSection.classList.toggle("d-none", !state.isEntered);
-
   const productsArea = byId("productsArea");
   const summaryArea = byId("reservationSummary");
+
+  if (welcomeSection) {
+    welcomeSection.classList.toggle("d-none", state.isEntered);
+  }
+
+  if (giftsSection) {
+    giftsSection.classList.toggle("d-none", !state.isEntered);
+  }
+
+  if (!productsArea || !summaryArea) return;
 
   if (state.showReservationSummary) {
     productsArea.classList.add("d-none");
@@ -288,7 +287,6 @@ function renderSections() {
     productsArea.classList.remove("d-none");
     summaryArea.classList.add("d-none");
   }
-
 }
 
 function renderProducts() {
@@ -412,7 +410,6 @@ function renderAll() {
 }
 
 async function enterWithName() {
-
   clearAlert();
 
   const name = byId("guestNameInput").value.trim();
@@ -428,24 +425,21 @@ async function enterWithName() {
   persistUi();
 
   try {
-
     showLoading("Carregando lista de presentes...");
 
     await loadProducts();
     await loadMyReservations();
 
+    state.showReservationSummary = state.myReservations.length > 0;
+
     updateCategories();
     renderAll();
 
     hideLoading();
-
   } catch (error) {
-
     hideLoading();
     showAlert(error.message, "danger");
-
   }
-
 }
 
 function changeName() {
@@ -453,6 +447,7 @@ function changeName() {
   state.isEntered = false;
   state.draftReserved = [];
   state.myReservations = [];
+  state.showReservationSummary = false;
   persistUi();
   byId("guestNameInput").value = "";
   renderAll();
@@ -535,7 +530,6 @@ function clearDraftList() {
 }
 
 async function confirmReservation() {
-
   clearAlert();
 
   if (!state.guestName) {
@@ -549,7 +543,6 @@ async function confirmReservation() {
   }
 
   try {
-
     showLoading("Confirmando reserva...");
 
     await apiPost({
@@ -563,24 +556,25 @@ async function confirmReservation() {
 
     state.draftReserved = [];
     persistUi();
+
     await loadProducts();
     await loadMyReservations();
+
+    state.showReservationSummary = state.myReservations.length > 0;
+
     updateCategories();
     renderAll();
-    hideLoading();
-    showAlert("Reserva confirmada com sucesso. Muito obrigado pelo carinho!", "success");
-    state.showReservationSummary = true;
-    renderAll();
-  } catch (error) {
 
+    hideLoading();
+
+    showAlert("Reserva confirmada com sucesso. Muito obrigado pelo carinho!", "success");
+  } catch (error) {
     hideLoading();
     showAlert(error.message, "danger");
-
   }
 }
 
 async function updateMyReservation(reservationId, delta) {
-
   clearAlert();
 
   const current = state.myReservations.find(item => Number(item.reservation_id) === Number(reservationId));
@@ -593,11 +587,9 @@ async function updateMyReservation(reservationId, delta) {
   const nextQty = Number(current.quantity) + delta;
 
   try {
-
     showLoading("Atualizando reserva...");
 
     if (nextQty <= 0) {
-
       await apiPost({
         action: "deleteReservation",
         reservationId: Number(reservationId),
@@ -607,13 +599,14 @@ async function updateMyReservation(reservationId, delta) {
       await loadProducts();
       await loadMyReservations();
 
+      state.showReservationSummary = state.myReservations.length > 0;
+
       updateCategories();
       renderAll();
 
       hideLoading();
 
       showAlert("Reserva removida com sucesso.", "secondary");
-
       return;
     }
 
@@ -627,28 +620,24 @@ async function updateMyReservation(reservationId, delta) {
     await loadProducts();
     await loadMyReservations();
 
+    state.showReservationSummary = state.myReservations.length > 0;
+
     updateCategories();
     renderAll();
 
     hideLoading();
 
     showAlert("Quantidade atualizada com sucesso.", "success");
-
   } catch (error) {
-
     hideLoading();
     showAlert(error.message, "danger");
-
   }
-
 }
 
 async function removeMyReservation(reservationId) {
-
   clearAlert();
 
   try {
-
     showLoading("Removendo reserva...");
 
     await apiPost({
@@ -660,20 +649,18 @@ async function removeMyReservation(reservationId) {
     await loadProducts();
     await loadMyReservations();
 
+    state.showReservationSummary = state.myReservations.length > 0;
+
     updateCategories();
     renderAll();
 
     hideLoading();
 
     showAlert("Reserva excluída com sucesso.", "secondary");
-
   } catch (error) {
-
     hideLoading();
     showAlert(error.message, "danger");
-
   }
-
 }
 
 function attachEventDelegation() {
@@ -732,6 +719,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const sortSelect = byId("sortSelect");
   const confirmBtn = byId("confirmBtn");
   const clearReservedBtn = byId("clearReservedBtn");
+  const restartBtn = byId("restartReservationBtn");
 
   if (guestNameInput) {
     guestNameInput.value = state.guestName || "";
@@ -748,6 +736,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (confirmBtn) confirmBtn.addEventListener("click", confirmReservation);
   if (clearReservedBtn) clearReservedBtn.addEventListener("click", clearDraftList);
 
+  if (restartBtn) {
+    restartBtn.addEventListener("click", () => {
+      state.showReservationSummary = false;
+      renderAll();
+    });
+  }
+
   attachEventDelegation();
   renderAll();
 
@@ -757,11 +752,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       showLoading("Carregando presentes...");
       await loadProducts();
       await loadMyReservations();
+
+      state.showReservationSummary = state.myReservations.length > 0;
+
       hideLoading();
       updateCategories();
       renderAll();
       showAlert('Você entrou como <strong>' + state.guestName + '</strong>.', "info");
     } catch (error) {
+      hideLoading();
       showAlert(error.message, "danger");
     }
   }
@@ -775,15 +774,6 @@ document.addEventListener("DOMContentLoaded", async function () {
           block: "start"
         });
       }
-    });
-  }
-
-  const restartBtn = byId("restartReservationBtn");
-
-  if (restartBtn) {
-    restartBtn.addEventListener("click", () => {
-      state.showReservationSummary = false;
-      renderAll();
     });
   }
 });
