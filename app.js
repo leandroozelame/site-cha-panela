@@ -616,6 +616,11 @@ async function confirmReservation() {
     updateCategories();
     renderAll();
 
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
     hideLoading();
 
     showAlert("Reserva confirmada com sucesso. Muito obrigado pelo carinho!", "success");
