@@ -564,7 +564,7 @@ function addGift(productId) {
   persistUi();
   renderDraftReserved();
   updateHeaderCart();
-  showAlert("Presente adicionado à sua lista de presente.", "success");
+  showAlert('Presente adicionado. <strong>Toque em "Ver minha lista"</strong> para finalizar.', "success");
 }
 
 function changeDraftQuantity(productId, delta) {
