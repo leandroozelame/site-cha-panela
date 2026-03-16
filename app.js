@@ -46,20 +46,38 @@ function renderReservationSummary() {
     return;
   }
 
-  container.innerHTML = state.myReservations.map(item => `
-    <div class="summary-item-card">
-      <img
-        class="summary-item-photo"
-        src="${item.image_url}"
-        alt="${item.product_name}"
-      >
-      <div class="summary-item-content">
-        <div class="summary-item-name">${item.product_name}</div>
-        <div class="summary-item-meta">${item.category}</div>
-        <div class="summary-item-meta">Quantidade: ${item.quantity}</div>
+  container.innerHTML = state.myReservations.map(item => {
+    const productRef = state.products.find(
+      p => Number(p.id) === Number(item.product_id)
+    );
+
+    const linkUrl = item.link_url || productRef?.link_url || "";
+
+    return `
+      <div class="summary-item-card">
+        <img
+          class="summary-item-photo"
+          src="${item.image_url}"
+          alt="${item.product_name}"
+        >
+        <div class="summary-item-content">
+          <div class="summary-item-name">${item.product_name}</div>
+          <div class="summary-item-meta"><strong>Categoria:</strong> ${item.category}</div>
+          <div class="summary-item-meta"><strong>Quantidade:</strong> ${item.quantity}</div>
+
+          <div class="summary-item-meta">
+            ${
+              linkUrl
+                ? `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer">
+                     Ver na ${nomeLojaPorUrl(linkUrl)}
+                   </a>`
+                : `<span class="text-muted">Sem link externo</span>`
+            }
+          </div>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function nomeLojaPorUrl(url) {
