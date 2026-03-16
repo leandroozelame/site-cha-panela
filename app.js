@@ -208,13 +208,26 @@ async function apiGet(params = {}) {
   if (!API_URL || API_URL.includes("COLE_AQUI")) {
     throw new Error("Configure a URL do Apps Script em config.js.");
   }
+
   const url = new URL(API_URL);
-  Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
-  const response = await fetch(url.toString(), { method: "GET" });
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  url.searchParams.set("_ts", Date.now());
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    cache: "no-store"
+  });
+
   const data = await response.json();
+
   if (!response.ok || data.ok === false) {
     throw new Error(data.error || "Erro ao consultar a planilha.");
   }
+
   return data;
 }
 
